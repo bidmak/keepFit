@@ -63,7 +63,6 @@ fun GoalScreen(
 }
 
 
-
 @Composable
 private fun GoalList(
     list: List<GoalData>
