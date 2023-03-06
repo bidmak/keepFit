@@ -1,4 +1,4 @@
-package com.example.keepfit.ui.Home
+package com.example.keepfit.ui.Activity
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -24,14 +24,45 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.keepfit.*
+import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.ui.TopBar
+import java.text.SimpleDateFormat
+import java.util.*
+
+fun Long.toDayString(): String {
+    return SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(Date(this))
+}
+
+
+fun getActivity(): ActivityData{
+    val activityData: ActivityData? = ActivityViewModel().getActivity(Date().time.toDayString())
+
+    if(activityData != null){
+        return activityData!!
+    } else {
+        ActivityViewModel().saveActivity(
+            ActivityData(
+                date = Date().time.toDayString(),
+                goalName = "Ambitious",
+                goalTarget = 6000,
+                steps = 0
+            )
+        )
+        return ActivityViewModel().getActivity(Date().time.toDayString())!!
+    }
+}
 
 @Composable
-fun HomeScreen(
-    activities: Activity,
+fun ActivityScreen(
     navController: NavController
 ){
+    val activities: ActivityData = ActivityData(
+        date = Date().time.toDayString(),
+        goalName = "Ambitious",
+        goalTarget = 6000,
+        steps = 0
+    )
+
     var steps = remember {
         mutableStateOf(activities.steps)
     }
@@ -40,8 +71,10 @@ fun HomeScreen(
         mutableStateOf("")
     }
 
+    val curPercentage = activities.steps.toFloat()/activities.goalTarget
+
     var percentage = remember {
-        mutableStateOf(activities.percentage)
+        mutableStateOf(curPercentage)
     }
 
 
@@ -62,7 +95,7 @@ fun HomeScreen(
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFAAAAAA),
             )
-            Text("Feb 21, 2023", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text("${activities.date}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Row(
@@ -120,7 +153,7 @@ fun HomeScreen(
                     color = Color(0xFFAAAAAA)
                 )
             }
-            ProgressBar( goalSteps = steps, percentage = percentage)
+            ProgressBar( steps = steps, percentage = percentage)
         }
 
 
@@ -233,7 +266,8 @@ fun HomeScreen(
                             value = addSteps,
                             onValueChange = { addedSteps -> addSteps = addedSteps },
                             label = { Text(text = "Add Steps") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(horizontal = 20.dp),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number
@@ -251,7 +285,8 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Button(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(horizontal = 20.dp),
                             onClick = {
                                 steps.value += addSteps.toInt()
@@ -273,7 +308,8 @@ fun HomeScreen(
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Button(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(20.dp),
                     onClick = { navController.navigate("editGoalScreen") },
                     shape = CircleShape,
@@ -297,8 +333,7 @@ fun HomeScreen(
 
 @Composable
 fun ProgressBar(
-    goalTarget: Int = Activity().goalTarget,
-    goalSteps: MutableState<Int>,
+    steps: MutableState<Int>,
     percentage: MutableState<Float>,
     number: Int = 100,
     fontSize: TextUnit = 24.sp,
@@ -310,10 +345,7 @@ fun ProgressBar(
 ){
 
     var steps by remember {
-        mutableStateOf(goalSteps)
-    }
-    var target by remember {
-        mutableStateOf(goalTarget)
+        mutableStateOf(steps)
     }
 
     var percentage by remember {

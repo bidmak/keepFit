@@ -28,7 +28,7 @@ import com.example.keepfit.*
 import com.example.keepfit.R
 import com.example.keepfit.ui.Goal.Goal
 import com.example.keepfit.ui.History.History
-import com.example.keepfit.ui.Home.Home
+import com.example.keepfit.ui.Activity.Activity
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -73,7 +73,7 @@ fun KeepFitApp(){
 fun Navigation(navController: NavHostController){
     NavHost(navController = navController, startDestination = "home"){
         composable("home"){
-            Home()
+            Activity()
         }
         composable("goal"){
             Goal()

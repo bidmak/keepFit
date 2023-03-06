@@ -9,11 +9,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -31,6 +28,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.keepfit.data.entity.ActivityData
+import com.example.keepfit.ui.CalendarInput
 import com.example.keepfit.ui.KeepFitApp
 import kotlinx.coroutines.launch
 
@@ -49,87 +48,6 @@ class MainActivity : ComponentActivity() {
 
 
 
-@Composable
-fun AddSteps(
-){
-
-}fun percent(stepsAdded: Int, steps: Int){
-    var activity = Activity()
-    var curSteps = activity.steps + stepsAdded
-    var percentage = steps/activity.goalTarget
-
-
-}
-
-
-@Composable
-fun EditTopBa(
-    title: String,
-    navigationIcon: Boolean = false,
-    iconMenu: Boolean = false,
-    actions: Boolean = false
-){
-    Box(
-        modifier = Modifier
-            .height(60.dp)
-            .fillMaxWidth(),
-    ){
-        TopAppBar(
-            backgroundColor = Color.White,
-            elevation = 14.dp,
-            contentColor = Color.Black,
-            title = {
-                Text(modifier = Modifier.padding(start = 10.dp),
-                    text = title
-                )
-            },
-            navigationIcon = {
-                if (navigationIcon){
-                    Icon(
-                        modifier = Modifier.padding(start = 10.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_back_ios_24),
-                        contentDescription = "cancel",
-                        tint = Color.Black)
-                }
-                if (iconMenu){
-                    Icon(
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "menu",
-                        tint = Color.Black)
-                }
-            },
-            actions = {
-                if (actions){
-                    Text(
-                        modifier = Modifier.padding(end =10.dp),
-                        text = "Add",
-                        fontSize = 16.sp
-                    )
-                }
-            }
-        )
-    }
-
-}
-
-
-@Composable
-fun GoalEditScreen() {
-
-}
-
-@Composable
-fun GoalSettingsScreen(){
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color(0xFFFAFAFA)),
-        contentAlignment = Alignment.Center
-    ){
-        Text("Goal settings screen")
-    }
-}
 
 
 private const val  CALENDAR_ROWS = 5
@@ -256,176 +174,6 @@ fun Calendar(
 
 }
 
-
-@Composable
-fun HistoryScreen(){
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFE6E6E6))
-    ) {
-        Box() {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.Center
-
-            ) {
-                Text("Sunday, Feb 26",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                )
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_calendar_month_24),
-                    modifier = Modifier.padding(start = 5.dp),
-                    contentDescription = "changeGoal",
-                    tint = Color(0xFF7E57C2)
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 50.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-
-            ) {
-                Text("Mon", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("Tue", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("Wed", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("Thu", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("Fri", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("Sat", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("Sun", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Red)
-            }
-        }
-
-        Box(){
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp),
-                horizontalAlignment = CenterHorizontally
-
-            ) {
-                //ProgressBar(goalSteps = Activity().steps, goalTarget = 6000)
-            }
-        }
-
-        Column(
-            modifier = Modifier
-                .padding(start = 20.dp, bottom = 5.dp),
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Text("Record",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.94f)
-                .offset(12.dp)
-                .shadow(elevation = 1.dp, shape = RoundedCornerShape(20.dp))
-                .background(Color.White)
-        ) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 30.dp, bottom = 40.dp),
-                horizontalArrangement = Arrangement.SpaceAround
-            ){
-                Column(
-                    modifier = Modifier
-                        .padding(),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text("Goal",
-                        fontSize = 18.sp,
-                        color = Color(0xFF689F38),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text("Ambitious",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                }
-
-                Column(
-                    modifier = Modifier
-                        .padding(),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text("Target",
-                        fontSize = 18.sp,
-                        color = Color(0xFF5C6BC0),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text("6000",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Text("steps",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFAAAAAA)
-                    )
-                }
-
-                Column(
-                    modifier = Modifier
-                        .padding(),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text("Move",
-                        fontSize = 18.sp,
-                        color = Color(0xFFD32F2F),
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text("5700",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Text("steps",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFAAAAAA)
-                    )
-                }
-            }
-
-        }
-
-        Column (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(0.dp, 28.dp, 0.dp, 28.dp),
-            horizontalAlignment = CenterHorizontally,
-        ){
-            Button(
-                modifier = Modifier.fillMaxWidth(0.8f),
-                onClick = { /*TODO*/ },
-                shape = CircleShape,
-                contentPadding = PaddingValues(14.dp),
-                colors = ButtonDefaults.buttonColors(Color.White)
-            ) {
-                Text("Clear History",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-            }
-        }
-    }
-}
 
 
 @Composable

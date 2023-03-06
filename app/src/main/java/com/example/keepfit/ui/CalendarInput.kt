@@ -1,4 +1,4 @@
-package com.example.keepfit
+package com.example.keepfit.ui
 
 data class CalendarInput(
     val day:Int,

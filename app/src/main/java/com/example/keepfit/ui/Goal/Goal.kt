@@ -18,7 +18,7 @@ fun Goal(
             GoalScreen(navController = appState.navController)
         }
         composable("addGoalScreen"){
-            AddGoalScreen(appState::navigationBack)
+            AddGoalScreen(navController = appState.navController, onBackPress = appState::navigationBack)
         }
     }
 }

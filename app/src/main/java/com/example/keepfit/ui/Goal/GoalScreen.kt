@@ -9,9 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Modifier
@@ -21,8 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.keepfit.Graph
+import com.example.keepfit.KeepFitAppState
 import com.example.keepfit.data.entity.GoalData
+import com.example.keepfit.data.repository.GoalDataRepository
+import com.example.keepfit.rememberKeepFitAppState
 import com.example.keepfit.ui.TopBar
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -70,8 +74,7 @@ private fun GoalList(
     ){
         items(list){ item ->
             GoalListItems(
-                goal = item,
-                onClick = {}
+                goal = item
             )
         }
     }
@@ -81,10 +84,14 @@ private fun GoalList(
 @Composable
 private fun GoalListItems(
     goal: GoalData,
-    onClick: () -> Unit
+    viewModel: GoalViewModel = viewModel(),
+    navController: NavController = rememberKeepFitAppState().navController
 ){
+    val coroutineScope = rememberCoroutineScope()
+
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Color(0xFFF1F1F1)),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -119,14 +126,21 @@ private fun GoalListItems(
                         color = Color.Gray
                     )
                 }
-                IconButton(onClick = { } ) {
+                IconButton(onClick = {
+                    navController.navigate("goalScreen")
+
+                } ) {
                     Icon(
                         modifier = Modifier.padding(horizontal = 10.dp),
                         imageVector = Icons.Default.Edit,
                         contentDescription = "edit",
                         tint = Color.Black)
                 }
-                IconButton(onClick = { } ) {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        viewModel.deleteGoal(goal)
+                    }
+                }) {
                     Icon(
                         modifier = Modifier.padding(horizontal = 10.dp),
                         imageVector = Icons.Default.Delete,
@@ -138,3 +152,4 @@ private fun GoalListItems(
     }
 
 }
+

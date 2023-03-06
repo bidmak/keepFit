@@ -1,15 +1,15 @@
-package com.example.keepfit.ui.Home
+package com.example.keepfit.ui.Activity
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.keepfit.Activity
+import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.KeepFitAppState
 import com.example.keepfit.rememberKeepFitAppState
+import java.util.*
 
 @Composable
-fun Home(
+fun Activity(
     appState: KeepFitAppState = rememberKeepFitAppState()
 ){
     NavHost(
@@ -17,10 +17,14 @@ fun Home(
         startDestination = "homeScreen"
     ){
         composable("homeScreen"){
-            HomeScreen(navController = appState.navController, activities = Activity())
+            ActivityScreen(
+                navController = appState.navController,
+            )
         }
         composable("editGoalScreen"){
-            EditGoalScreen(appState::navigationBack)
+            EditGoalScreen(navController = appState.navController)
         }
     }
 }
+
+

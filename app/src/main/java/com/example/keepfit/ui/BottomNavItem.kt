@@ -1,4 +1,4 @@
-package com.example.keepfit
+package com.example.keepfit.ui
 
 import android.media.Image
 import androidx.compose.ui.graphics.vector.ImageVector

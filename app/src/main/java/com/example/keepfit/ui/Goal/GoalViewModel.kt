@@ -11,45 +11,52 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.keepfit.Graph
+import com.example.keepfit.Graph.goalDataRepository
 import com.example.keepfit.data.entity.GoalData
+import com.example.keepfit.data.repository.GoalDataRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class GoalViewModel: ViewModel() {
+class GoalViewModel(
+    private val goalDataRepository: GoalDataRepository = Graph.goalDataRepository
+) : ViewModel() {
+
     private val _state = MutableStateFlow(GoalViewState())
+
     val state: StateFlow<GoalViewState>
         get() = _state
 
+    suspend fun addGoal(goal: GoalData): Long {
+        return  goalDataRepository.saveGoal(goal)
+    }
+
+    suspend fun editGoal(goal: GoalData) {
+        return  goalDataRepository.editCurrentGoal(goal)
+    }
+
+    suspend fun getGoal(goal: String): GoalData? {
+        return  goalDataRepository.getGoalByName(goal)
+    }
+
+
+    suspend fun deleteGoal(goal: GoalData): Int {
+        return  goalDataRepository.removeGoal(goal)
+    }
+
+
     init {
-        val list = mutableListOf<GoalData>()
-        for (x in 1..10){
-            list.add(
-                GoalData(
-                    goalName = "Goal $x",
-                    goalTarget = 3000 + (x *2000)
-                 )
-            )
-        }
         viewModelScope.launch {
-            _state.value = GoalViewState(
-                goals = list
-            )
+            goalDataRepository.goals().collect{goals ->
+                _state.value = GoalViewState(goals)
+            }
         }
     }
 }
+
 
 data class GoalViewState(
+
     val goals: List<GoalData> = emptyList(),
 )
-
-@Composable
-fun Edit(){
-    IconButton(onClick = {  } ) {
-        Icon(
-            modifier = Modifier.padding(horizontal = 10.dp),
-            imageVector = Icons.Default.Menu,
-            contentDescription = "menu",
-            tint = Color.Black)
-    }
-}
