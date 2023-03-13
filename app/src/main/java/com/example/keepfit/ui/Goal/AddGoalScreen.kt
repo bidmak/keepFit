@@ -1,6 +1,5 @@
 package com.example.keepfit.ui.Goal
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,19 +14,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.ui.EditTopBar
 import kotlinx.coroutines.launch
 
 @Composable
 fun AddGoalScreen(
-    goalName: MutableState<String> = rememberSaveable { mutableStateOf("") },
-    goalTarget: MutableState<String> = rememberSaveable { mutableStateOf("")},
-    navController: NavController,
     onBackPress: () -> Unit,
-    viewModel: GoalViewModel = viewModel()
+    goalName: String = "",
+    goalTarget: String = ""
 ){
+    val goalName = rememberSaveable { mutableStateOf(goalName) }
+    val goalTarget = rememberSaveable { mutableStateOf(goalTarget)}
+
+    val viewModel: GoalViewModel = viewModel()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -45,7 +45,7 @@ fun AddGoalScreen(
                 value = goalName.value,
                 onValueChange = {goal-> goalName.value = goal},
                 label = {Text(text = "Add Goal Name")},
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier.fillMaxWidth(0.9f),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text
                 ),
@@ -57,16 +57,16 @@ fun AddGoalScreen(
                 value = goalTarget.value,
                 onValueChange = {target-> goalTarget.value = target},
                 label = { Text(text = "Add Goal Target")},
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier.fillMaxWidth(0.9f),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
                 shape = CircleShape,
                 singleLine = true
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Button(
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier.fillMaxWidth(0.9f),
                 onClick = {
 
                         coroutineScope.launch {
@@ -78,10 +78,10 @@ fun AddGoalScreen(
                                 )
                             )
                         }
-                        navController.navigate("addGoalScreen")
+                    onBackPress()
                     },
                 shape = CircleShape,
-                contentPadding = PaddingValues(14.dp),
+                contentPadding = PaddingValues(18.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF5C6BC0)),
             ) {
                 Text("Add Goal",

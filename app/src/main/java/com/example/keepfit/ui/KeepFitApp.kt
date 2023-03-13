@@ -40,18 +40,18 @@ fun KeepFitApp(){
             BottomNavigationBar(
                 items = listOf(
                     BottomNavItem(
-                        name = "Home",
-                        route = "home",
+                        name = Screen.Activity.route,
+                        route = Screen.Activity.route,
                         icon = Icons.Default.Home
                     ),
                     BottomNavItem(
-                        name = "Goal",
-                        route = "goal",
+                        name = Screen.Goal.route,
+                        route = Screen.Goal.route,
                         icon = Icons.Default.Add
                     ),
                     BottomNavItem(
-                        name = "History",
-                        route = "history",
+                        name = Screen.History.route,
+                        route = Screen.History.route,
                         icon = ImageVector.vectorResource(id = R.drawable.baseline_history_24)
                     ),
                 ),
@@ -71,14 +71,14 @@ fun KeepFitApp(){
 
 @Composable
 fun Navigation(navController: NavHostController){
-    NavHost(navController = navController, startDestination = "home"){
-        composable("home"){
+    NavHost(navController = navController, startDestination = Screen.Activity.route){
+        composable(route = Screen.Activity.route){
             Activity()
         }
-        composable("goal"){
+        composable(route = Screen.Goal.route){
             Goal()
         }
-        composable("history"){
+        composable(route = Screen.History.route){
             History()
         }
 

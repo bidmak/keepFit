@@ -23,59 +23,57 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
+import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 fun Long.toDayString(): String {
     return SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(Date(this))
 }
 
-
-fun getActivity(): ActivityData{
-    val activityData: ActivityData? = ActivityViewModel().getActivity(Date().time.toDayString())
-
-    if(activityData != null){
-        return activityData!!
-    } else {
-        ActivityViewModel().saveActivity(
-            ActivityData(
-                date = Date().time.toDayString(),
-                goalName = "Ambitious",
-                goalTarget = 6000,
-                steps = 0
-            )
+suspend fun updateAct(viewModel: ActivityViewModel, curActivity: ActivityData, addedSteps: Int){
+    val date = Date().time.toDayString()
+    viewModel.saveActivity(
+        ActivityData(
+            date = date,
+            goalName = curActivity.goalName,
+            goalTarget = curActivity.goalTarget,
+            steps = curActivity.steps + addedSteps
         )
-        return ActivityViewModel().getActivity(Date().time.toDayString())!!
-    }
+    )
 }
 
 @Composable
 fun ActivityScreen(
     navController: NavController
 ){
-    val activities: ActivityData = ActivityData(
-        date = Date().time.toDayString(),
-        goalName = "Ambitious",
+    val viewModel: ActivityViewModel = viewModel()
+    val viewState by viewModel.state.collectAsState()
+
+    val date = Date().time.toDayString()
+    val curActivity = viewState.activities.firstOrNull { activity -> activity.date == date } ?: ActivityData(
+        date = date,
+        goalName = "Goal",
         goalTarget = 6000,
         steps = 0
     )
 
-    var steps = remember {
-        mutableStateOf(activities.steps)
+    val coroutineScope = rememberCoroutineScope()
+
+    var steps by remember {
+        mutableStateOf(curActivity.steps)
     }
 
     var addSteps by remember {
         mutableStateOf("")
     }
 
-    val curPercentage = activities.steps.toFloat()/activities.goalTarget
-
-    var percentage = remember {
-        mutableStateOf(curPercentage)
-    }
 
 
     Column(
@@ -95,7 +93,7 @@ fun ActivityScreen(
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFAAAAAA),
             )
-            Text("${activities.date}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text("${curActivity.date}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Row(
@@ -114,7 +112,7 @@ fun ActivityScreen(
                     color = Color(0xFF689F38),
                     fontWeight = FontWeight.Bold
                 )
-                Text("${activities.goalName}",
+                Text("${curActivity.goalName}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -125,7 +123,7 @@ fun ActivityScreen(
                     color = Color(0xFF5C6BC0),
                     fontWeight = FontWeight.Bold
                 )
-                Text("${activities.goalTarget}",
+                Text("${curActivity.goalTarget}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -142,7 +140,7 @@ fun ActivityScreen(
                     fontWeight = FontWeight.Bold
                 )
 
-                Text(text = "${steps.value}",
+                Text(text = "${curActivity.steps}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -153,7 +151,7 @@ fun ActivityScreen(
                     color = Color(0xFFAAAAAA)
                 )
             }
-            ProgressBar( steps = steps, percentage = percentage)
+            ProgressBar(curActivity = curActivity)
         }
 
 
@@ -194,8 +192,13 @@ fun ActivityScreen(
                         ) {
                             Button(
                                 onClick = {
-                                    steps.value += 50
-                                    percentage.value = steps.value.toFloat() / activities.goalTarget
+                                    coroutineScope.launch {
+                                        updateAct(
+                                            viewModel = viewModel,
+                                            curActivity = curActivity,
+                                            addedSteps = 50
+                                        )
+                                    }
                                 },
                                 enabled = true,
                                 shape = CircleShape,
@@ -211,8 +214,13 @@ fun ActivityScreen(
                             }
                             Button(
                                 onClick = {
-                                    steps.value += 100
-                                    percentage.value = steps.value.toFloat() / activities.goalTarget
+                                    coroutineScope.launch {
+                                        updateAct(
+                                            viewModel = viewModel,
+                                            curActivity = curActivity,
+                                            addedSteps = 100
+                                        )
+                                    }
                                 },
                                 enabled = true,
                                 shape = CircleShape,
@@ -228,8 +236,13 @@ fun ActivityScreen(
                             }
                             Button(
                                 onClick = {
-                                    steps.value += 200
-                                    percentage.value = steps.value.toFloat() / activities.goalTarget
+                                    coroutineScope.launch {
+                                        updateAct(
+                                            viewModel = viewModel,
+                                            curActivity = curActivity,
+                                            addedSteps = 200
+                                        )
+                                    }
                                 },
                                 enabled = true,
                                 shape = CircleShape,
@@ -245,8 +258,13 @@ fun ActivityScreen(
                             }
                             Button(
                                 onClick = {
-                                    steps.value += 500
-                                    percentage.value = steps.value.toFloat() / activities.goalTarget
+                                    coroutineScope.launch {
+                                        updateAct(
+                                            viewModel = viewModel,
+                                            curActivity = curActivity,
+                                            addedSteps = 500
+                                        )
+                                    }
                                 },
                                 enabled = true,
                                 shape = CircleShape,
@@ -274,10 +292,15 @@ fun ActivityScreen(
                             ),
                             keyboardActions = KeyboardActions(
                                 onDone = {
-                                    steps.value += addSteps.toInt()
-                                    percentage.value = steps.value.toFloat() / activities.goalTarget
-                                    addSteps = ""
-                                    navController.navigate("homeScreen")
+                                    coroutineScope.launch {
+                                        val addedSteps = addSteps.toInt()
+                                        updateAct(
+                                            viewModel = viewModel,
+                                            curActivity = curActivity,
+                                            addedSteps = addedSteps
+                                        )
+                                        addSteps = ""
+                                    }
                                 }
                             ),
                             singleLine = true,
@@ -289,13 +312,19 @@ fun ActivityScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 20.dp),
                             onClick = {
-                                steps.value += addSteps.toInt()
-                                percentage.value = steps.value.toFloat() / activities.goalTarget
-                                addSteps = ""
+                                coroutineScope.launch {
+                                    val addedSteps = addSteps.toInt()
+                                    updateAct(
+                                        viewModel = viewModel,
+                                        curActivity = curActivity,
+                                        addedSteps = addedSteps
+                                    )
+                                    addSteps = ""
+                                }
                             },
                             contentPadding = PaddingValues(14.dp),
                             shape = CircleShape,
-                            colors = ButtonDefaults.buttonColors(Color(0xFF5C6BC0))
+                            colors = ButtonDefaults.buttonColors(Color(0xFFB39DDB))
                         ) {
                             Text(
                                 "Add",
@@ -311,13 +340,18 @@ fun ActivityScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp),
-                    onClick = { navController.navigate("editGoalScreen") },
+                    onClick = { navController.navigate(route = Screen.EditActivityScreen.passActivity(
+                        date = curActivity.date,
+                        goalName = curActivity.goalName,
+                        goalTarget = curActivity.goalTarget,
+                        steps = curActivity.steps
+                    )) },
                     shape = CircleShape,
                     contentPadding = PaddingValues(14.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFFC2185B))
+                    colors = ButtonDefaults.buttonColors(Color(0xFF5C6BC0))
                 ) {
                     Text(
-                        "Edit Goal",
+                        "Edit Activity",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -333,8 +367,7 @@ fun ActivityScreen(
 
 @Composable
 fun ProgressBar(
-    steps: MutableState<Int>,
-    percentage: MutableState<Float>,
+    curActivity: ActivityData,
     number: Int = 100,
     fontSize: TextUnit = 24.sp,
     radius: Dp = 140.dp,
@@ -344,13 +377,7 @@ fun ProgressBar(
     animDelay: Int = 0
 ){
 
-    var steps by remember {
-        mutableStateOf(steps)
-    }
-
-    var percentage by remember {
-        mutableStateOf(percentage)
-    }
+    var percentage = curActivity.steps.toFloat()/curActivity.goalTarget
 
     var animationPlayed by remember {
         mutableStateOf(false)
@@ -358,7 +385,7 @@ fun ProgressBar(
 
 
     var curPercentage = animateFloatAsState(
-        targetValue = if(animationPlayed) percentage.value else 0f,
+        targetValue = if(animationPlayed) percentage else 0f,
         animationSpec = tween(
             durationMillis = animDuration,
             delayMillis = animDelay
@@ -387,7 +414,7 @@ fun ProgressBar(
             )
 
         }
-        var percentageText = (percentage.value * number).toInt().toString()
+        var percentageText = (percentage * number).toInt().toString()
 
         Column(
             modifier = Modifier
@@ -401,7 +428,7 @@ fun ProgressBar(
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF5C6BC0)
             )
-            Text("${steps.value} steps", fontSize = 15.sp,
+            Text("${curActivity.steps} steps", fontSize = 15.sp,
                 color = Color(0xFF969696),
                 fontWeight = FontWeight.Bold)
         }

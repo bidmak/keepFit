@@ -22,7 +22,6 @@ object Graph {
 
     fun provide(context: Context){
         database = Room.databaseBuilder(context, KeepFitDataBase::class.java, "data.db")
-            .fallbackToDestructiveMigration()
             .build()
     }
 }

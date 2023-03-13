@@ -36,8 +36,8 @@ class GoalViewModel(
         return  goalDataRepository.editCurrentGoal(goal)
     }
 
-    suspend fun getGoal(goal: String): GoalData? {
-        return  goalDataRepository.getGoalByName(goal)
+    suspend fun getGoal(goalName: String): GoalData? {
+        return  goalDataRepository.getGoalByName(goalName)
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.keepfit.ui.Goal
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ import com.example.keepfit.KeepFitAppState
 import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.data.repository.GoalDataRepository
 import com.example.keepfit.rememberKeepFitAppState
+import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
 import kotlinx.coroutines.launch
 
@@ -40,41 +42,38 @@ fun GoalScreen(
         modifier = Modifier.padding(bottom = 60.dp),
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("addGoalScreen")},
+                onClick = { navController.navigate(route = Screen.AddGoalScreen.route)},
                 contentColor = Color.Black,
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.padding(20.dp),
+                backgroundColor = Color(0xFF5C6BC0)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.White
                 )
             }
         }
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF1F1F1))
         ) {
             TopBar(title = "Goals")
-            GoalList(
-                list = viewState.goals
-            )
-        }
-    }
-}
 
-
-@Composable
-private fun GoalList(
-    list: List<GoalData>
-) {
-    LazyColumn(
-        contentPadding = PaddingValues(0.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
-    ){
-        items(list){ item ->
-            GoalListItems(
-                goal = item
-            )
+            val list = viewState.goals
+            LazyColumn(
+                contentPadding = PaddingValues(0.dp),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ){
+                items(list){ item ->
+                    GoalListItems(
+                        goal = item,
+                        navController = navController
+                    )
+                }
+            }
         }
     }
 }
@@ -84,19 +83,18 @@ private fun GoalList(
 private fun GoalListItems(
     goal: GoalData,
     viewModel: GoalViewModel = viewModel(),
-    navController: NavController = rememberKeepFitAppState().navController
+    navController: NavController
 ){
     val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF1F1F1)),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Box(
             modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 3.dp)
+                .padding(horizontal = 5.dp, vertical = 2.dp)
                 .fillMaxWidth()
                 .shadow(elevation = 1.dp, shape = RoundedCornerShape(10.dp))
                 .background(Color.White)
@@ -126,7 +124,13 @@ private fun GoalListItems(
                     )
                 }
                 IconButton(onClick = {
-                    navController.navigate("goalScreen")
+
+                    navController.navigate(
+                        route = Screen.AddGoalScreen.passGoal(
+                        goalName = goal.goalName,
+                        goalTarget = "${goal.goalTarget}"
+                        )
+                    )
 
                 } ) {
                     Icon(

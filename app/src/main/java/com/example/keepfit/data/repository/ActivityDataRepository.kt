@@ -21,12 +21,12 @@ class ActivityDataRepository (
     /**
      *  To add [ActivityData] to the DataBase
      */
-    fun saveActivity(activity: ActivityData) = activityDataDao.insert(activity)
+    suspend fun saveActivity(activity: ActivityData): Long = activityDataDao.insert(activity)
 
     /**
      *  To delete [ActivityData] from the DataBase
      */
-    suspend fun removeActivity(activity: ActivityData) = activityDataDao.delete(activity)
+    fun removeActivity(activity: ActivityData) = activityDataDao.delete(activity)
 
     /**
      *  To update current [ActivityData] in the DataBase
@@ -41,7 +41,7 @@ class ActivityDataRepository (
     /**
      *  To get [ActivityData] by date from the DataBase
      */
-    suspend fun getStepsByDate(date: String): Int = activityDataDao.getActivityStepsByDate(date)
+    fun getStepsByDate(date: String): Int = activityDataDao.getActivityStepsByDate(date)
 
 
 }

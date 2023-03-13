@@ -6,7 +6,9 @@ import com.example.keepfit.Graph
 import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.data.repository.ActivityDataRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ActivityViewModel(
@@ -17,7 +19,7 @@ class ActivityViewModel(
     val state: StateFlow<ActivityViewState>
         get() = _state
 
-    fun saveActivity(activity: ActivityData): Long {
+    suspend fun saveActivity(activity: ActivityData): Long {
         return activityDataRepository.saveActivity(activity)
     }
 
@@ -28,9 +30,11 @@ class ActivityViewModel(
     suspend fun updateActivity(activity: ActivityData) {
         return activityDataRepository.editCurrentActivity(activity)
     }
-    suspend fun getSteps(date: String): Int {
+    fun getSteps(date: String): Int {
         return activityDataRepository.getStepsByDate(date)
     }
+
+    var activityDataList = activityDataRepository.activities().stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = listOf())
 
 
     init {

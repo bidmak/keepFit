@@ -1,6 +1,5 @@
 package com.example.keepfit.ui.Activity
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -17,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.ui.EditTopBar
@@ -27,76 +25,87 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun EditGoalScreen(
-    navController: NavController,
-    viewModel: GoalViewModel = viewModel(),
-    activityViewModel: ActivityViewModel = viewModel()
+fun EditActivityScreen(
+    onBackPress: () -> Unit,
+    date: String,
+    goalName: String,
+    goalTarget: Int,
+    steps: Int
 ){
-    val viewState by viewModel.state.collectAsState()
+
+    val activityViewModel: ActivityViewModel = viewModel()
+    val activityViewState by activityViewModel.state.collectAsState()
+    val curActivity = ActivityData(
+        date = date,
+        goalName = goalName,
+        goalTarget = goalTarget,
+        steps = steps
+    )
+
+    val goalViewModel: GoalViewModel = viewModel()
+    val goalViewState by goalViewModel.state.collectAsState()
+
+    var selectedGoalName = rememberSaveable { mutableStateOf(curActivity.goalName)}
+    val selectedGoalTarget = rememberSaveable { mutableStateOf(curActivity.goalTarget)}
+
+    var expanded by remember { mutableStateOf(false) }
+
+    val icon = if(expanded){
+        Icons.Filled.ArrowDropUp
+    } else {
+        Icons.Filled.ArrowDropDown
+    }
 
     val coroutineScope = rememberCoroutineScope()
 
-    val selectedGoal = rememberSaveable { mutableStateOf("")}
     Surface {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding()
-                .background(Color(0xFFF5F5F5))
         ) {
 
-            EditTopBar(title = "Edit Goal", back = true, onBackPress = {navController.navigate("homeScreen")})
-            Box(modifier = Modifier
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 40.dp),
-                    horizontalArrangement = Arrangement.Center
+            EditTopBar(title = "Edit Goal", back = true, onBackPress = onBackPress)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 40.dp),
+                horizontalArrangement = Arrangement.Center
 
-                ) {
-                    Text(
-                        "Today",
-                        modifier = Modifier.padding(horizontal = 5.dp),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF969696),
-                    )
-                    Text("${Date().time.toDayString()}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
+            ) {
+                Text(
+                    "Today",
+                    modifier = Modifier.padding(horizontal = 5.dp),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF969696),
+                )
+                Text("${curActivity.date}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
+
+            Text(
+                "Select a goal",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 14.dp, vertical = 4.dp),
-                horizontalAlignment = Alignment.Start,
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    "Select a goal",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-            }
-            Spacer(modifier = Modifier.height(30.dp))
-
-
-            var expanded by remember { mutableStateOf(false) }
-            var getGoal = GoalData("",0)
-
-            val icon = if(expanded){
-                Icons.Filled.ArrowDropUp
-            } else {
-                Icons.Filled.ArrowDropDown
-            }
-
-            Column {
                 OutlinedTextField(
-                    value = selectedGoal.value,
-                    onValueChange = {selectedGoal.value = it},
-                    modifier = Modifier.fillMaxWidth(),
+                    value = selectedGoalName.value,
+                    onValueChange = {selectedGoalName.value = it},
+                    modifier = Modifier.fillMaxWidth(0.9f),
                     label = {Text(text = "Goal")},
                     readOnly = true,
+                    shape = CircleShape,
                     trailingIcon = {
                         Icon(
                             imageVector = icon,
@@ -108,48 +117,53 @@ fun EditGoalScreen(
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
                 )
                 {
-                    viewState.goals.forEach { curGoal ->
-                        DropdownMenuItem(onClick = {
-                            selectedGoal.value = curGoal.goalName
-                            expanded = false
+                    goalViewState.goals.forEach { curGoal ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedGoalName.value = curGoal.goalName
+                                selectedGoalTarget.value = curGoal.goalTarget
+                                expanded = false
                         }) {
-                            Text(text = curGoal.goalName)
-                            getGoal = curGoal
+                            Text(text = "${curGoal.goalName} (${curGoal.goalTarget})")
+
                         }
+
                     }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    modifier = Modifier.fillMaxWidth(0.9f),
+                    onClick = {
+                        coroutineScope.launch {
+                            activityViewModel.saveActivity(
+                                ActivityData(
+                                    date = curActivity.date,
+                                    goalName = selectedGoalName.value,
+                                    goalTarget = selectedGoalTarget.value,
+                                    steps = curActivity.steps
+                                )
+                            )
+                            onBackPress()
+                        }
+                    },
+                    shape = CircleShape,
+                    contentPadding = PaddingValues(18.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFF5C6BC0)),
+                ) {
+                    Text("Save Goal",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-            Button(
-                modifier = Modifier.fillMaxWidth(0.8f),
-                onClick = {
-                    coroutineScope.launch {
-                        activityViewModel.saveActivity(
-                            ActivityData(
-                                date = Date().time.toDayString(),
-                                goalName = getGoal.goalName,
-                                goalTarget = getGoal.goalTarget,
-                                steps = 0
-                            )
-                        )
-                        // activityViewModel.getSteps(Date().time.toDayString())
-                        navController.navigate("homeScreen")
-                    }
-                          },
-                shape = CircleShape,
-                contentPadding = PaddingValues(14.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFF5C6BC0)),
-            ) {
-                Text("Save Goal",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                )
-            }
+
 
         }
     }
