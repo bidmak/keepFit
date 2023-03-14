@@ -38,6 +38,12 @@ fun History(
             )
         }
 
+        composable(route = Screen.HistoryScreen.route){
+            HistoryScreen(
+                navController = appState.navController
+            )
+        }
+
         composable(
             route = Screen.EditHistoryRecordScreen.route,
             arguments = listOf(

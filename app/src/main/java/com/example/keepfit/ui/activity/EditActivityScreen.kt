@@ -17,11 +17,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.keepfit.data.entity.ActivityData
+import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.goal.GoalViewModel
 import com.example.keepfit.ui.theme.ButtonColor
 import com.example.keepfit.ui.theme.LightTextColor
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun EditActivityScreen(
@@ -31,6 +33,7 @@ fun EditActivityScreen(
     goalTarget: Int,
     steps: Int
 ){
+
 
     val activityViewModel: ActivityViewModel = viewModel()
     val curActivity = ActivityData(

@@ -22,8 +22,11 @@ fun Goal(
         composable(route = Screen.GoalScreen.route){
             GoalScreen(navController = appState.navController)
         }
+        composable(route = Screen.AddGoalScreen.route){
+            AddGoalScreen(onBackPress = appState::navigationBack)
+        }
         composable(
-            route = Screen.AddGoalScreen.route,
+            route = Screen.EditGoalScreen.route,
             arguments = listOf(
                 navArgument(GOAL_NAME){
                     type = NavType.StringType
@@ -38,7 +41,7 @@ fun Goal(
             val goalName = it.arguments?.getString(GOAL_NAME) ?: ""
             val goalTarget = it.arguments?.getString(GOAL_TARGET) ?: ""
 
-            AddGoalScreen(
+            EditGoalScreen(
                 onBackPress = appState::navigationBack,
                 goalName = goalName,
                 goalTarget = goalTarget

@@ -37,5 +37,9 @@ class GoalDataRepository(
      */
     suspend fun getGoalByName(goalName: String) = goalDataDao.getGoalDataByName(goalName)
 
+    /**
+     *  To update [GoalData] in the DataBase
+     */
+    suspend fun updateGoalData(goal: GoalData) = goalDataDao.update(goal)
 
 }

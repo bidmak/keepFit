@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
+import com.example.keepfit.ui.activity.activeGoal
 import com.example.keepfit.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -63,6 +64,7 @@ fun GoalScreen(
                 verticalArrangement = Arrangement.SpaceEvenly
             ){
                 items(list){ item ->
+
                     GoalListItems(
                         goal = item,
                         navController = navController
@@ -118,33 +120,36 @@ private fun GoalListItems(
                         color = Color.Gray
                     )
                 }
-                IconButton(onClick = {
+                if(activeGoal != goal.goalName){
+                    IconButton(onClick = {
 
-                    navController.navigate(
-                        route = Screen.AddGoalScreen.passGoal(
-                        goalName = goal.goalName,
-                        goalTarget = "${goal.goalTarget}"
+                        navController.navigate(
+                            route = Screen.EditGoalScreen.passGoal(
+                                goalName = goal.goalName,
+                                goalTarget = "${goal.goalTarget}"
+                            )
                         )
-                    )
 
-                } ) {
-                    Icon(
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "edit",
-                        tint = EditColor)
-                }
-                IconButton(onClick = {
-                    coroutineScope.launch {
-                        viewModel.deleteGoal(goal)
+                    } ) {
+                        Icon(
+                            modifier = Modifier.padding(horizontal = 10.dp),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "edit",
+                            tint = EditColor)
                     }
-                }) {
-                    Icon(
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "delete",
-                        tint = DeleteColor)
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            viewModel.deleteGoal(goal)
+                        }
+                    }) {
+                        Icon(
+                            modifier = Modifier.padding(horizontal = 10.dp),
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "delete",
+                            tint = DeleteColor)
+                    }
                 }
+
             }
         }
     }

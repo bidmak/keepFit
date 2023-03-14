@@ -22,6 +22,11 @@ class GoalViewModel(
         return  goalDataRepository.saveGoal(goal)
     }
 
+    suspend fun updateGoal(goal: GoalData) {
+        return  goalDataRepository.updateGoalData(goal)
+    }
+
+
     suspend fun editGoal(goal: GoalData) {
         return  goalDataRepository.editCurrentGoal(goal)
     }

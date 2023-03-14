@@ -27,17 +27,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
-import com.example.keepfit.rememberKeepFitAppState
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
 import com.example.keepfit.ui.activity.ActivityViewModel
 import com.example.keepfit.ui.activity.ProgressBar
-import com.example.keepfit.ui.theme.*
+import com.example.keepfit.ui.theme.BackgroundColorMain
+import com.example.keepfit.ui.theme.DeleteColor
+import com.example.keepfit.ui.theme.EditColor
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HistoryRecordScreen(
+fun HistoryScreen(
     navController: NavController
 ){
     val viewModel: ActivityViewModel = viewModel()
@@ -49,14 +50,14 @@ fun HistoryRecordScreen(
                 .fillMaxSize()
                 .background(BackgroundColorMain)
         ) {
-            TopBar(title = "History", menu = true, onClick = {navController.navigate(Screen.HistoryScreen.route)})
+            TopBar(title = "History", menu = true, onClick = {navController.navigate(Screen.HistoryRecordScreen.route)})
 
             LazyColumn(
                 contentPadding = PaddingValues(0.dp),
                 verticalArrangement = Arrangement.SpaceEvenly
             ){
                 items(viewState.activities){ activityData ->
-                    HisListItems(
+                    ListItems(
                         activity = activityData,
                         navController = navController
                     )
@@ -66,9 +67,8 @@ fun HistoryRecordScreen(
     }
 }
 
-
 @Composable
-private fun HisListItems(
+private fun ListItems(
     activity: ActivityData,
     viewModel: ActivityViewModel = viewModel(),
     navController: NavController
@@ -132,23 +132,6 @@ private fun HisListItems(
                     showSteps = false,
                     color = DeleteColor
                 )
-
-                IconButton(onClick = {
-                    navController.navigate(Screen.EditHistoryRecordScreen.passActivity(
-                        date = activity.date,
-                        goalName = activity.goalName,
-                        goalTarget = activity.goalTarget,
-                        steps = activity.steps
-                    )) }
-                )
-
-                {
-                    Icon(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 30.dp),
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "edit",
-                        tint = EditColor)
-                }
 
                 IconButton(onClick = {
                     coroutineScope.launch {

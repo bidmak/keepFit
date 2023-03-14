@@ -50,6 +50,9 @@ suspend fun updateAct(viewModel: ActivityViewModel, curActivity: ActivityData, a
     )
 }
 
+var activeGoal: String = ""
+
+
 @Composable
 fun ActivityScreen(
     navController: NavController
@@ -64,6 +67,8 @@ fun ActivityScreen(
         goalTarget = 6000,
         steps = 0
     )
+
+    activeGoal = curActivity.goalName
 
     val coroutineScope = rememberCoroutineScope()
 
