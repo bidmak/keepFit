@@ -1,9 +1,9 @@
-package com.example.keepfit.ui.Activity
+package com.example.keepfit.ui.history
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -14,39 +14,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.keepfit.data.entity.ActivityData
-import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.ui.EditTopBar
-import com.example.keepfit.ui.Goal.GoalViewModel
-import com.example.keepfit.ui.Goal.GoalViewState
+import com.example.keepfit.ui.activity.ActivityViewModel
+import com.example.keepfit.ui.goal.GoalViewModel
+import com.example.keepfit.ui.theme.ButtonColor
+import com.example.keepfit.ui.theme.LightTextColor
 import kotlinx.coroutines.launch
-import java.util.*
 
 @Composable
-fun EditActivityScreen(
+fun EditHistoryRecordScreen(
     onBackPress: () -> Unit,
     date: String,
     goalName: String,
     goalTarget: Int,
     steps: Int
 ){
-
     val activityViewModel: ActivityViewModel = viewModel()
-    val activityViewState by activityViewModel.state.collectAsState()
-    val curActivity = ActivityData(
+    val curHistory = ActivityData(
         date = date,
         goalName = goalName,
         goalTarget = goalTarget,
         steps = steps
     )
 
+
     val goalViewModel: GoalViewModel = viewModel()
     val goalViewState by goalViewModel.state.collectAsState()
 
-    var selectedGoalName = rememberSaveable { mutableStateOf(curActivity.goalName)}
-    val selectedGoalTarget = rememberSaveable { mutableStateOf(curActivity.goalTarget)}
+    val selectedGoalName = rememberSaveable { mutableStateOf(curHistory.goalName) }
+    val selectedGoalTarget = rememberSaveable { mutableStateOf(curHistory.goalTarget) }
+    val selectedSteps = rememberSaveable { mutableStateOf("${ curHistory.steps }") }
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -64,7 +66,7 @@ fun EditActivityScreen(
                 .fillMaxSize()
         ) {
 
-            EditTopBar(title = "Edit Goal", back = true, onBackPress = onBackPress)
+            EditTopBar(title = "Edit History", back = true, onBackPress = onBackPress)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -72,27 +74,10 @@ fun EditActivityScreen(
                 horizontalArrangement = Arrangement.Center
 
             ) {
-                Text(
-                    "Today",
-                    modifier = Modifier.padding(horizontal = 5.dp),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF969696),
-                )
-                Text("${curActivity.date}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("${curHistory.date}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
-            Text(
-                "Select a goal",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Column(
                 modifier = Modifier
@@ -103,7 +88,7 @@ fun EditActivityScreen(
                     value = selectedGoalName.value,
                     onValueChange = {selectedGoalName.value = it},
                     modifier = Modifier.fillMaxWidth(0.9f),
-                    label = {Text(text = "Goal")},
+                    label = { Text(text = "Goal") },
                     readOnly = true,
                     shape = CircleShape,
                     trailingIcon = {
@@ -128,13 +113,28 @@ fun EditActivityScreen(
                                 selectedGoalName.value = curGoal.goalName
                                 selectedGoalTarget.value = curGoal.goalTarget
                                 expanded = false
-                        }) {
+                            }) {
                             Text(text = "${curGoal.goalName} (${curGoal.goalTarget})")
 
                         }
 
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = selectedSteps.value,
+                    onValueChange = {selectedSteps.value = it},
+                    label = { Text(text = "Steps")},
+                    modifier = Modifier.fillMaxWidth(0.9f),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    shape = CircleShape,
+                    singleLine = true
+                )
+
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     modifier = Modifier.fillMaxWidth(0.9f),
@@ -142,10 +142,10 @@ fun EditActivityScreen(
                         coroutineScope.launch {
                             activityViewModel.saveActivity(
                                 ActivityData(
-                                    date = curActivity.date,
+                                    date = curHistory.date,
                                     goalName = selectedGoalName.value,
                                     goalTarget = selectedGoalTarget.value,
-                                    steps = curActivity.steps
+                                    steps = selectedSteps.value.toInt()
                                 )
                             )
                             onBackPress()
@@ -153,9 +153,9 @@ fun EditActivityScreen(
                     },
                     shape = CircleShape,
                     contentPadding = PaddingValues(18.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF5C6BC0)),
+                    colors = ButtonDefaults.buttonColors(ButtonColor),
                 ) {
-                    Text("Save Goal",
+                    Text("Save",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -167,57 +167,4 @@ fun EditActivityScreen(
 
         }
     }
-}
-
-
-@Composable
-fun GoalListDropDown(
-    viewState: GoalViewState,
-    goal: MutableState<String>
-){
-    var expanded by remember { mutableStateOf(false) }
-    var getGoal: GoalData
-
-    val icon = if(expanded){
-        Icons.Filled.ArrowDropUp
-    } else {
-        Icons.Filled.ArrowDropDown
-    }
-
-    Column {
-        OutlinedTextField(
-            value = goal.value,
-            onValueChange = {goal.value = it},
-            modifier = Modifier.fillMaxWidth(),
-            label = {Text(text = "Goal")},
-            readOnly = true,
-            trailingIcon = {
-                           Icon(
-                               imageVector = icon,
-                               contentDescription = null,
-                               modifier = Modifier.clickable { expanded = !expanded }
-                           )
-            }
-        )
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
-        )
-        {
-            viewState.goals.forEach { curGoal ->
-                DropdownMenuItem(onClick = {
-                    goal.value = curGoal.goalName
-                    expanded = false
-                }) {
-                    Text(text = curGoal.goalName)
-                    getGoal = curGoal
-                }
-            }
-        }
-    }
-}
-
-fun getCurGoal(curGoal: GoalData): GoalData{
-    return curGoal
 }

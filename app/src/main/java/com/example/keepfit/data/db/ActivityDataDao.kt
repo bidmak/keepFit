@@ -11,9 +11,6 @@ interface ActivityDataDao {
     @Query("SELECT * FROM activities WHERE date = :date")
     fun getActivityDataByDate(date: String): ActivityData?
 
-    @Query("SELECT steps FROM activities WHERE date = :date")
-    fun getActivityStepsByDate(date: String): Int
-
     @Query("SELECT * FROM activities")
     fun activities(): Flow<List<ActivityData>>
 
@@ -24,5 +21,5 @@ interface ActivityDataDao {
     suspend fun update(entity: ActivityData)
 
     @Delete
-    fun delete(entity: ActivityData): Int
+    suspend fun delete(entity: ActivityData): Int
 }

@@ -1,21 +1,11 @@
-package com.example.keepfit.ui.History
+package com.example.keepfit.ui.history
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -25,155 +15,79 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.example.keepfit.data.entity.ActivityData
-import com.example.keepfit.data.entity.GoalData
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.example.keepfit.KeepFitAppState
 import com.example.keepfit.rememberKeepFitAppState
-import com.example.keepfit.ui.Activity.ActivityViewModel
-import com.example.keepfit.ui.Goal.GoalViewModel
-import com.example.keepfit.ui.TopBar
-import kotlinx.coroutines.launch
+import com.example.keepfit.ui.*
+import com.example.keepfit.ui.theme.*
 
 @Composable
-fun History(){
-    HisScreen()
-}
-
-
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@Composable
-fun HisScreen(){
-    val viewModel: ActivityViewModel = viewModel()
-    val viewState by viewModel.state.collectAsState()
-
-    Scaffold {
-        Column(
-            modifier = Modifier.fillMaxSize()
-                .background(Color(0xFFF1F1F1))
-        ) {
-            TopBar(title = "History")
-            HisList(
-                list = viewState.activities
-            )
-        }
-    }
-}
-
-
-@Composable
-private fun HisList(
-    list: List<ActivityData>
-) {
-    LazyColumn(
-        contentPadding = PaddingValues(0.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
-    ){
-        items(list){ item ->
-            HisListItems(
-                activities = item
-            )
-        }
-    }
-}
-
-
-@Composable
-private fun HisListItems(
-    activities: ActivityData,
-    viewModel: ActivityViewModel = viewModel(),
-    navController: NavController = rememberKeepFitAppState().navController
+fun History(
+    appState: KeepFitAppState = rememberKeepFitAppState()
 ){
-    val coroutineScope = rememberCoroutineScope()
+    NavHost(
+        navController = appState.navController,
+        startDestination = Screen.HistoryRecordScreen.route
+    ){
+        composable(route = Screen.HistoryRecordScreen.route){
+            HistoryRecordScreen(
+                navController = appState.navController
+            )
+        }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 5.dp, vertical = 2.dp)
-                .fillMaxWidth()
-                .shadow(elevation = 1.dp, shape = RoundedCornerShape(10.dp))
-                .background(Color.White)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f),
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    Text(
-                        text = activities.date,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = activities.goalName,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = "${activities.goalTarget} steps",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "${activities.steps}",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
+        composable(
+            route = Screen.EditHistoryRecordScreen.route,
+            arguments = listOf(
+                navArgument(ACTIVITY_DATE){
+                    type = NavType.StringType
+                    defaultValue = "Date"
+                },
+                navArgument(ACTIVITY_NAME){
+                    type = NavType.StringType
+                    defaultValue = "Goal"
+                },
+                navArgument(ACTIVITY_TARGET){
+                    type = NavType.IntType
+                    defaultValue = 5000
+                },
+                navArgument(ACTIVITY_STEP){
+                    type = NavType.IntType
+                    defaultValue = 0
                 }
+            )
+        ){
+            val date = it.arguments?.getString(ACTIVITY_DATE)
+            val goalName = it.arguments?.getString(ACTIVITY_NAME)
+            val goalTarget = it.arguments?.getInt(ACTIVITY_TARGET)
+            val steps = it.arguments?.getInt(ACTIVITY_STEP)
 
-                IconButton(onClick = {
-                    navController.navigate("goalScreen") }
-                )
-
-                {
-                    Icon(
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "edit",
-                        tint = Color.Black)
-                }
-
-                IconButton(onClick = {
-                    coroutineScope.launch {
-                        viewModel.updateActivity(activities)
-                    }
-                }) {
-                    Icon(
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "delete",
-                        tint = Color.Black)
-                }
-            }
+            EditHistoryRecordScreen(
+                onBackPress = appState::navigationBack,
+                date = date!!,
+                goalName = goalName!!,
+                goalTarget = goalTarget!!,
+                steps = steps!!
+            )
         }
     }
-
 }
 
 
 
+
+
+
 @Composable
-fun HistoryScreen(){
+fun HistoryScrn(){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFE6E6E6))
+            .background(BackgroundColor)
     ) {
-        Box() {
+        Box {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -210,7 +124,7 @@ fun HistoryScreen(){
             }
         }
 
-        Box(){
+        Box {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -272,7 +186,7 @@ fun HistoryScreen(){
                 ) {
                     Text("Target",
                         fontSize = 18.sp,
-                        color = Color(0xFF5C6BC0),
+                        color = ButtonColor,
                         fontWeight = FontWeight.Bold
                     )
                     Text("6000",
@@ -283,7 +197,7 @@ fun HistoryScreen(){
                     Text("steps",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFAAAAAA)
+                        color = LightGrayColor
                     )
                 }
 
@@ -294,7 +208,7 @@ fun HistoryScreen(){
                 ) {
                     Text("Move",
                         fontSize = 18.sp,
-                        color = Color(0xFFD32F2F),
+                        color = MoveColor,
                         fontWeight = FontWeight.Bold
                     )
 
@@ -306,7 +220,7 @@ fun HistoryScreen(){
                     Text("steps",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFAAAAAA)
+                        color = LightGrayColor
                     )
                 }
             }

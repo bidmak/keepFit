@@ -26,7 +26,7 @@ class ActivityDataRepository (
     /**
      *  To delete [ActivityData] from the DataBase
      */
-    fun removeActivity(activity: ActivityData) = activityDataDao.delete(activity)
+    suspend fun removeActivity(activity: ActivityData): Int = activityDataDao.delete(activity)
 
     /**
      *  To update current [ActivityData] in the DataBase
@@ -36,12 +36,7 @@ class ActivityDataRepository (
     /**
      *  To get [ActivityData] by date from the DataBase
      */
-    fun getActivityDataByDate(date: String): ActivityData? = activityDataDao.getActivityDataByDate(date)
-
-    /**
-     *  To get [ActivityData] by date from the DataBase
-     */
-    fun getStepsByDate(date: String): Int = activityDataDao.getActivityStepsByDate(date)
+/// fun getActivityDataByDate(date: String): ActivityData? = activityDataDao.getActivityDataByDate(date)
 
 
 }

@@ -1,4 +1,4 @@
-package com.example.keepfit.ui.Goal
+package com.example.keepfit.ui.goal
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.ui.EditTopBar
+import com.example.keepfit.ui.theme.ButtonColor
 import kotlinx.coroutines.launch
 
 @Composable
@@ -82,7 +83,7 @@ fun AddGoalScreen(
                     },
                 shape = CircleShape,
                 contentPadding = PaddingValues(18.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFF5C6BC0)),
+                colors = ButtonDefaults.buttonColors(ButtonColor),
             ) {
                 Text("Add Goal",
                     fontSize = 16.sp,

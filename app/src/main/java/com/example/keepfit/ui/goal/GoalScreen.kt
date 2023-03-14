@@ -1,7 +1,6 @@
-package com.example.keepfit.ui.Goal
+package com.example.keepfit.ui.goal
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Modifier
@@ -21,13 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.keepfit.Graph
-import com.example.keepfit.KeepFitAppState
 import com.example.keepfit.data.entity.GoalData
-import com.example.keepfit.data.repository.GoalDataRepository
-import com.example.keepfit.rememberKeepFitAppState
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
+import com.example.keepfit.ui.theme.*
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -45,7 +40,7 @@ fun GoalScreen(
                 onClick = { navController.navigate(route = Screen.AddGoalScreen.route)},
                 contentColor = Color.Black,
                 modifier = Modifier.padding(20.dp),
-                backgroundColor = Color(0xFF5C6BC0)
+                backgroundColor = ButtonColor
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -58,7 +53,7 @@ fun GoalScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF1F1F1))
+                .background(BackgroundColorMain)
         ) {
             TopBar(title = "Goals")
 
@@ -112,7 +107,7 @@ private fun GoalListItems(
                 ) {
                     Text(
                         text = goal.goalName,
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
@@ -137,7 +132,7 @@ private fun GoalListItems(
                         modifier = Modifier.padding(horizontal = 10.dp),
                         imageVector = Icons.Default.Edit,
                         contentDescription = "edit",
-                        tint = Color.Black)
+                        tint = EditColor)
                 }
                 IconButton(onClick = {
                     coroutineScope.launch {
@@ -148,7 +143,7 @@ private fun GoalListItems(
                         modifier = Modifier.padding(horizontal = 10.dp),
                         imageVector = Icons.Default.Delete,
                         contentDescription = "delete",
-                        tint = Color.Black)
+                        tint = DeleteColor)
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.example.keepfit.ui.Activity
+package com.example.keepfit.ui.activity
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
+import com.example.keepfit.ui.theme.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -66,14 +67,9 @@ fun ActivityScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    var steps by remember {
-        mutableStateOf(curActivity.steps)
-    }
-
     var addSteps by remember {
         mutableStateOf("")
     }
-
 
 
     Column(
@@ -91,7 +87,7 @@ fun ActivityScreen(
             Text("Today",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFAAAAAA),
+                color = LightGrayColor,
             )
             Text("${curActivity.date}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
@@ -120,7 +116,7 @@ fun ActivityScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Target",
                     fontSize = 18.sp,
-                    color = Color(0xFF5C6BC0),
+                    color = ButtonColor,
                     fontWeight = FontWeight.Bold
                 )
                 Text("${curActivity.goalTarget}",
@@ -131,12 +127,12 @@ fun ActivityScreen(
                 Text("steps",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFAAAAAA)
+                    color = LightGrayColor
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Move",
                     fontSize = 18.sp,
-                    color = Color(0xFFD32F2F),
+                    color = MoveColor,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -148,7 +144,7 @@ fun ActivityScreen(
                 Text("steps",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFAAAAAA)
+                    color = LightGrayColor
                 )
             }
             ProgressBar(curActivity = curActivity)
@@ -158,7 +154,7 @@ fun ActivityScreen(
         Box(modifier = Modifier
             .shadow(elevation = 4.dp)
             .fillMaxHeight()
-            .background(Color(0xFFE6E6E6))) {
+            .background(BackgroundColor)) {
 
             Column(
                 modifier = Modifier
@@ -203,7 +199,7 @@ fun ActivityScreen(
                                 enabled = true,
                                 shape = CircleShape,
                                 contentPadding = PaddingValues(14.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFFB39DDB))
+                                colors = ButtonDefaults.buttonColors(AddButtonColor)
                             ) {
                                 Text(
                                     "+50",
@@ -225,7 +221,7 @@ fun ActivityScreen(
                                 enabled = true,
                                 shape = CircleShape,
                                 contentPadding = PaddingValues(14.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFFB39DDB))
+                                colors = ButtonDefaults.buttonColors(AddButtonColor)
                             ) {
                                 Text(
                                     "+100",
@@ -247,7 +243,7 @@ fun ActivityScreen(
                                 enabled = true,
                                 shape = CircleShape,
                                 contentPadding = PaddingValues(14.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFFB39DDB))
+                                colors = ButtonDefaults.buttonColors(AddButtonColor)
                             ) {
                                 Text(
                                     "+200",
@@ -269,7 +265,7 @@ fun ActivityScreen(
                                 enabled = true,
                                 shape = CircleShape,
                                 contentPadding = PaddingValues(14.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFFB39DDB))
+                                colors = ButtonDefaults.buttonColors(AddButtonColor)
                             ) {
                                 Text(
                                     "+500",
@@ -324,7 +320,7 @@ fun ActivityScreen(
                             },
                             contentPadding = PaddingValues(14.dp),
                             shape = CircleShape,
-                            colors = ButtonDefaults.buttonColors(Color(0xFFB39DDB))
+                            colors = ButtonDefaults.buttonColors(AddButtonColor)
                         ) {
                             Text(
                                 "Add",
@@ -348,7 +344,7 @@ fun ActivityScreen(
                     )) },
                     shape = CircleShape,
                     contentPadding = PaddingValues(14.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF5C6BC0))
+                    colors = ButtonDefaults.buttonColors(ButtonColor)
                 ) {
                     Text(
                         "Edit Activity",
@@ -371,20 +367,22 @@ fun ProgressBar(
     number: Int = 100,
     fontSize: TextUnit = 24.sp,
     radius: Dp = 140.dp,
-    color: Color = Color(0xFFD32F2F),
+    color: Color = MoveColor,
     strokeWidth: Dp = 16.dp,
     animDuration: Int = 1000,
-    animDelay: Int = 0
+    animDelay: Int = 0,
+    showSteps: Boolean = true,
+    percentageColor: Color = ButtonColor
 ){
 
-    var percentage = curActivity.steps.toFloat()/curActivity.goalTarget
+    val percentage = curActivity.steps.toFloat()/curActivity.goalTarget
 
     var animationPlayed by remember {
         mutableStateOf(false)
     }
 
 
-    var curPercentage = animateFloatAsState(
+    val curPercentage = animateFloatAsState(
         targetValue = if(animationPlayed) percentage else 0f,
         animationSpec = tween(
             durationMillis = animDuration,
@@ -414,7 +412,7 @@ fun ProgressBar(
             )
 
         }
-        var percentageText = (percentage * number).toInt().toString()
+        val percentageText = (percentage * number).toInt().toString()
 
         Column(
             modifier = Modifier
@@ -426,11 +424,13 @@ fun ProgressBar(
                 text = ("${percentageText}%"),
                 fontSize = fontSize,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF5C6BC0)
+                color = percentageColor
             )
-            Text("${curActivity.steps} steps", fontSize = 15.sp,
-                color = Color(0xFF969696),
-                fontWeight = FontWeight.Bold)
+            if(showSteps){
+                Text("${curActivity.steps} steps", fontSize = 15.sp,
+                    color = LightTextColor,
+                    fontWeight = FontWeight.Bold)
+            }
         }
     }
 }

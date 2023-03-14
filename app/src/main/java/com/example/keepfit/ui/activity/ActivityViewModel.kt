@@ -1,4 +1,4 @@
-package com.example.keepfit.ui.Activity
+package com.example.keepfit.ui.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,9 +6,7 @@ import com.example.keepfit.Graph
 import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.data.repository.ActivityDataRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ActivityViewModel(
@@ -23,18 +21,13 @@ class ActivityViewModel(
         return activityDataRepository.saveActivity(activity)
     }
 
-    fun getActivity(date: String): ActivityData? {
-        return activityDataRepository.getActivityDataByDate(date)
+    suspend fun deleteActivity(activity: ActivityData): Int {
+        return activityDataRepository.removeActivity(activity)
     }
 
     suspend fun updateActivity(activity: ActivityData) {
         return activityDataRepository.editCurrentActivity(activity)
     }
-    fun getSteps(date: String): Int {
-        return activityDataRepository.getStepsByDate(date)
-    }
-
-    var activityDataList = activityDataRepository.activities().stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = listOf())
 
 
     init {

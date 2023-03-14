@@ -13,6 +13,7 @@ sealed class Screen(val route: String){
     object Goal: Screen(route = "goal")
     object History: Screen(route = "history")
 
+
     object ActivityScreen: Screen(route = "activityScreen")
     object EditActivityScreen: Screen(route = "editActivityScreen" +
             "?date={$ACTIVITY_DATE}" +
@@ -33,6 +34,7 @@ sealed class Screen(val route: String){
         }
     }
 
+
     object GoalScreen: Screen(route = "goalScreen")
     object AddGoalScreen: Screen(route = "addGoalScreen?goalName={$GOAL_NAME}&goalTarget={$GOAL_TARGET}"){
         fun passGoal(
@@ -44,6 +46,24 @@ sealed class Screen(val route: String){
     }
 
 
-    object HistoryScreen: Screen(route = "historyScreen")
-    object EditHistoryScreen: Screen(route = "editHistoryScreen")
+    object HistoryRecordScreen: Screen(route = "historyRecordScreen")
+    object EditHistoryRecordScreen: Screen(route = "editHistoryRecordScreen" +
+            "?date={$ACTIVITY_DATE}" +
+            "&goalName={$ACTIVITY_NAME}" +
+            "&goalTarget={$ACTIVITY_TARGET}" +
+            "&steps={$ACTIVITY_STEP}"
+    ){
+        fun passActivity(
+            date: String,
+            goalName: String,
+            goalTarget: Int,
+            steps: Int
+        ): String {
+            return "editHistoryRecordScreen" +
+                    "?date=$date" +
+                    "&goalName=$goalName" +
+                    "&goalTarget=$goalTarget" +
+                    "&steps=$steps"
+        }
+    }
 }

@@ -26,9 +26,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.keepfit.*
 import com.example.keepfit.R
-import com.example.keepfit.ui.Goal.Goal
-import com.example.keepfit.ui.History.History
-import com.example.keepfit.ui.Activity.Activity
+import com.example.keepfit.ui.goal.Goal
+import com.example.keepfit.ui.history.History
+import com.example.keepfit.ui.activity.Activity
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable

@@ -1,18 +1,8 @@
-package com.example.keepfit.ui.Goal
+package com.example.keepfit.ui.goal
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.keepfit.Graph
-import com.example.keepfit.Graph.goalDataRepository
 import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.data.repository.GoalDataRepository
 import kotlinx.coroutines.flow.MutableStateFlow

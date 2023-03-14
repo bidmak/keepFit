@@ -1,4 +1,4 @@
-package com.example.keepfit.ui.Activity
+package com.example.keepfit.ui.activity
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
@@ -19,9 +19,10 @@ fun Activity(
     ){
         composable(route = Screen.ActivityScreen.route){
             ActivityScreen(
-                navController = appState.navController,
+                navController = appState.navController
             )
         }
+
         composable(
             route = Screen.EditActivityScreen.route,
             arguments = listOf(
@@ -31,11 +32,11 @@ fun Activity(
                 },
                 navArgument(ACTIVITY_NAME){
                     type = NavType.StringType
-                    defaultValue = "Goal Name"
+                    defaultValue = "Goal"
                 },
                 navArgument(ACTIVITY_TARGET){
                     type = NavType.IntType
-                    defaultValue = 6000
+                    defaultValue = 5000
                 },
                 navArgument(ACTIVITY_STEP){
                     type = NavType.IntType
