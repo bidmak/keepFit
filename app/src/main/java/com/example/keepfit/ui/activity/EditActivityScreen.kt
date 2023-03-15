@@ -1,5 +1,6 @@
 package com.example.keepfit.ui.activity
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,8 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.data.entity.GoalData
+import com.example.keepfit.ui.BottomNavigationBar
 import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.goal.GoalViewModel
 import com.example.keepfit.ui.theme.ButtonColor
@@ -25,8 +28,10 @@ import com.example.keepfit.ui.theme.LightTextColor
 import kotlinx.coroutines.launch
 
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun EditActivityScreen(
+    bottomNavController: NavController,
     onBackPress: () -> Unit,
     date: String,
     goalName: String,
@@ -59,13 +64,17 @@ fun EditActivityScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    Surface {
+    Scaffold(
+        topBar = { EditTopBar(title = "Edit Activity", back = true, onBackPress = onBackPress) },
+        bottomBar = { BottomNavigationBar(
+            onItemClick = { bottomNavController.navigate(it.route) },
+            navController = bottomNavController
+        ) }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
-            EditTopBar(title = "Edit Goal", back = true, onBackPress = onBackPress)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

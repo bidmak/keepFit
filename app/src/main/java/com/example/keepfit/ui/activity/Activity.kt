@@ -1,6 +1,7 @@
 package com.example.keepfit.ui.activity
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,7 +12,8 @@ import com.example.keepfit.ui.*
 
 @Composable
 fun Activity(
-    appState: KeepFitAppState = rememberKeepFitAppState()
+    appState: KeepFitAppState = rememberKeepFitAppState(),
+    bottomNavController: NavController
 ){
     NavHost(
         navController = appState.navController,
@@ -19,7 +21,8 @@ fun Activity(
     ){
         composable(route = Screen.ActivityScreen.route){
             ActivityScreen(
-                navController = appState.navController
+                navController = appState.navController,
+                bottomNavController = bottomNavController
             )
         }
 
@@ -49,6 +52,7 @@ fun Activity(
             val goalTarget = it.arguments?.getInt(ACTIVITY_TARGET)
             val steps = it.arguments?.getInt(ACTIVITY_STEP)
             EditActivityScreen(
+                bottomNavController = bottomNavController,
                 onBackPress = appState::navigationBack,
                 date = date!!,
                 goalName = goalName!!,

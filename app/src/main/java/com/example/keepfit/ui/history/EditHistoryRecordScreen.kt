@@ -1,5 +1,6 @@
 package com.example.keepfit.ui.history
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -18,7 +19,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
+import com.example.keepfit.ui.BottomNavigationBar
 import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.activity.ActivityViewModel
 import com.example.keepfit.ui.goal.GoalViewModel
@@ -26,8 +29,10 @@ import com.example.keepfit.ui.theme.ButtonColor
 import com.example.keepfit.ui.theme.LightTextColor
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun EditHistoryRecordScreen(
+    bottomNavController: NavController,
     onBackPress: () -> Unit,
     date: String,
     goalName: String,
@@ -59,14 +64,20 @@ fun EditHistoryRecordScreen(
     }
 
     val coroutineScope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
 
-    Surface {
+    Scaffold(
+        topBar = { EditTopBar(title = "Editable History", back = true, onBackPress = onBackPress) },
+        bottomBar = { BottomNavigationBar(
+            onItemClick = { bottomNavController.navigate(it.route) },
+            navController = bottomNavController
+        ) },
+        scaffoldState = scaffoldState
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
-            EditTopBar(title = "Edit History", back = true, onBackPress = onBackPress)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -140,15 +151,25 @@ fun EditHistoryRecordScreen(
                     modifier = Modifier.fillMaxWidth(0.9f),
                     onClick = {
                         coroutineScope.launch {
-                            activityViewModel.saveActivity(
-                                ActivityData(
-                                    date = curHistory.date,
-                                    goalName = selectedGoalName.value,
-                                    goalTarget = selectedGoalTarget.value,
-                                    steps = selectedSteps.value.toInt()
+                            try{
+                                val steps = selectedSteps.value.toInt()
+                                activityViewModel.saveActivity(
+                                    ActivityData(
+                                        date = curHistory.date,
+                                        goalName = selectedGoalName.value,
+                                        goalTarget = selectedGoalTarget.value,
+                                        steps = steps
+                                    )
                                 )
-                            )
-                            onBackPress()
+                                onBackPress()
+                            } catch (e: Exception){
+                                selectedSteps.value = "${ curHistory.steps }"
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    message ="Steps can only be a numeric value",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+
                         }
                     },
                     shape = CircleShape,

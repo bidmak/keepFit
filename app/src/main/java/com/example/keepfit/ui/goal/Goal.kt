@@ -1,6 +1,7 @@
 package com.example.keepfit.ui.goal
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,17 +14,23 @@ import com.example.keepfit.ui.Screen
 
 @Composable
 fun Goal(
-    appState: KeepFitAppState = rememberKeepFitAppState()
+    appState: KeepFitAppState = rememberKeepFitAppState(),
+    bottomNavController: NavController
 ){
     NavHost(
         navController = appState.navController,
         startDestination = Screen.GoalScreen.route
     ){
         composable(route = Screen.GoalScreen.route){
-            GoalScreen(navController = appState.navController)
+            GoalScreen(navController = appState.navController,
+                bottomNavController = bottomNavController
+            )
         }
         composable(route = Screen.AddGoalScreen.route){
-            AddGoalScreen(onBackPress = appState::navigationBack)
+            AddGoalScreen(
+                onBackPress = appState::navigationBack,
+                bottomNavController = bottomNavController
+            )
         }
         composable(
             route = Screen.EditGoalScreen.route,
@@ -42,6 +49,7 @@ fun Goal(
             val goalTarget = it.arguments?.getString(GOAL_TARGET) ?: ""
 
             EditGoalScreen(
+                bottomNavController = bottomNavController,
                 onBackPress = appState::navigationBack,
                 goalName = goalName,
                 goalTarget = goalTarget

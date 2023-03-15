@@ -1,5 +1,6 @@
 package com.example.keepfit.ui.activity
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
+import com.example.keepfit.ui.BottomNavigationBar
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
 import com.example.keepfit.ui.theme.*
@@ -38,24 +40,43 @@ fun Long.toDayString(): String {
     return SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(Date(this))
 }
 
-suspend fun updateAct(viewModel: ActivityViewModel, curActivity: ActivityData, addedSteps: Int){
+suspend fun updateAct(
+    viewModel: ActivityViewModel,
+    curActivity: ActivityData,
+    addedSteps: MutableState<String>,
+    scaffoldState: ScaffoldState
+){
     val date = Date().time.toDayString()
-    viewModel.saveActivity(
-        ActivityData(
-            date = date,
-            goalName = curActivity.goalName,
-            goalTarget = curActivity.goalTarget,
-            steps = curActivity.steps + addedSteps
+    try {
+        val steps = addedSteps.value.toInt()
+        viewModel.saveActivity(
+            ActivityData(
+                date = date,
+                goalName = curActivity.goalName,
+                goalTarget = curActivity.goalTarget,
+                steps = curActivity.steps + steps
+            )
         )
-    )
+        addedSteps.value = ""
+    } catch (e: Exception){
+        addedSteps.value = ""
+        scaffoldState.snackbarHostState.showSnackbar(
+            message ="Please enter only numeric value",
+            duration = SnackbarDuration.Short
+        )
+    }
+
 }
+
 
 var activeGoal: String = ""
 
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ActivityScreen(
-    navController: NavController
+    navController: NavController,
+    bottomNavController: NavController
 ){
     val viewModel: ActivityViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
@@ -64,303 +85,321 @@ fun ActivityScreen(
     val curActivity = viewState.activities.firstOrNull { activity -> activity.date == date } ?: ActivityData(
         date = date,
         goalName = "Goal",
-        goalTarget = 6000,
+        goalTarget = 5000,
         steps = 0
     )
 
     activeGoal = curActivity.goalName
 
     val coroutineScope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
 
-    var addSteps by remember {
-        mutableStateOf("")
-    }
+    val addSteps = remember { mutableStateOf("") }
+    val steps = remember { mutableStateOf("") }
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        TopBar("Dashboard")
+    Scaffold (
+        topBar = { TopBar("Dashboard") },
+        bottomBar = {
+            BottomNavigationBar(
+                onItemClick = { bottomNavController.navigate(it.route) },
+                navController = bottomNavController
+            )
+        },
+        scaffoldState = scaffoldState
+            ){
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 5.dp, end = 20.dp),
-            horizontalAlignment = Alignment.End
-
+                .fillMaxSize()
         ) {
-            Text("Today",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = LightGrayColor,
-            )
-            Text("${curActivity.date}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 5.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Column(
-                modifier = Modifier,
-                horizontalAlignment = Alignment.Start
-            ) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Goal",
-                    fontSize = 18.sp,
-                    color = Color(0xFF689F38),
-                    fontWeight = FontWeight.Bold
-                )
-                Text("${curActivity.goalName}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Target",
-                    fontSize = 18.sp,
-                    color = ButtonColor,
-                    fontWeight = FontWeight.Bold
-                )
-                Text("${curActivity.goalTarget}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                Text("steps",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = LightGrayColor
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Move",
-                    fontSize = 18.sp,
-                    color = MoveColor,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(text = "${curActivity.steps}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                Text("steps",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = LightGrayColor
-                )
-            }
-            ProgressBar(curActivity = curActivity)
-        }
-
-
-        Box(modifier = Modifier
-            .shadow(elevation = 4.dp)
-            .fillMaxHeight()
-            .background(BackgroundColor)) {
 
             Column(
                 modifier = Modifier
-                .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(top = 5.dp, end = 20.dp),
+                horizontalAlignment = Alignment.End
+
             ) {
-                Box(
-                    modifier = Modifier
-                        .offset(8.dp, 8.dp)
-                        .shadow(elevation = 1.dp, shape = RoundedCornerShape(20.dp))
-                        .background(Color.White)
-                        .fillMaxWidth(0.96f)
+                Text("Today",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = LightGrayColor,
+                )
+                Text("${curActivity.date}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Column(
+                    modifier = Modifier,
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Column(
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Goal",
+                        fontSize = 18.sp,
+                        color = Color(0xFF689F38),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text("${curActivity.goalName}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Target",
+                        fontSize = 18.sp,
+                        color = ButtonColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text("${curActivity.goalTarget}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Text("steps",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = LightGrayColor
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Move",
+                        fontSize = 18.sp,
+                        color = MoveColor,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(text = "${curActivity.steps}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Text("steps",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = LightGrayColor
+                    )
+                }
+                ProgressBar(curActivity = curActivity)
+            }
+
+
+            Box(modifier = Modifier
+                .shadow(elevation = 4.dp)
+                .fillMaxHeight()
+                .background(BackgroundColor)) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                ) {
+                    Box(
                         modifier = Modifier
-                            .padding(14.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.Start,
+                            .offset(8.dp, 8.dp)
+                            .shadow(elevation = 1.dp, shape = RoundedCornerShape(20.dp))
+                            .background(Color.White)
+                            .fillMaxWidth(0.96f)
                     ) {
-                        Text(
-                            "Quick Add",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        updateAct(
-                                            viewModel = viewModel,
-                                            curActivity = curActivity,
-                                            addedSteps = 50
-                                        )
-                                    }
-                                },
-                                enabled = true,
-                                shape = CircleShape,
-                                contentPadding = PaddingValues(14.dp),
-                                colors = ButtonDefaults.buttonColors(AddButtonColor)
-                            ) {
-                                Text(
-                                    "+50",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        updateAct(
-                                            viewModel = viewModel,
-                                            curActivity = curActivity,
-                                            addedSteps = 100
-                                        )
-                                    }
-                                },
-                                enabled = true,
-                                shape = CircleShape,
-                                contentPadding = PaddingValues(14.dp),
-                                colors = ButtonDefaults.buttonColors(AddButtonColor)
-                            ) {
-                                Text(
-                                    "+100",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        updateAct(
-                                            viewModel = viewModel,
-                                            curActivity = curActivity,
-                                            addedSteps = 200
-                                        )
-                                    }
-                                },
-                                enabled = true,
-                                shape = CircleShape,
-                                contentPadding = PaddingValues(14.dp),
-                                colors = ButtonDefaults.buttonColors(AddButtonColor)
-                            ) {
-                                Text(
-                                    "+200",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        updateAct(
-                                            viewModel = viewModel,
-                                            curActivity = curActivity,
-                                            addedSteps = 500
-                                        )
-                                    }
-                                },
-                                enabled = true,
-                                shape = CircleShape,
-                                contentPadding = PaddingValues(14.dp),
-                                colors = ButtonDefaults.buttonColors(AddButtonColor)
-                            ) {
-                                Text(
-                                    "+500",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(10.dp))
-                        OutlinedTextField(
-                            value = addSteps,
-                            onValueChange = { addedSteps -> addSteps = addedSteps },
-                            label = { Text(text = "Add Steps") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    coroutineScope.launch {
-                                        val addedSteps = addSteps.toInt()
-                                        updateAct(
-                                            viewModel = viewModel,
-                                            curActivity = curActivity,
-                                            addedSteps = addedSteps
-                                        )
-                                        addSteps = ""
-                                    }
-                                }
-                            ),
-                            singleLine = true,
-                            shape = CircleShape
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
-                            onClick = {
-                                coroutineScope.launch {
-                                    val addedSteps = addSteps.toInt()
-                                    updateAct(
-                                        viewModel = viewModel,
-                                        curActivity = curActivity,
-                                        addedSteps = addedSteps
-                                    )
-                                    addSteps = ""
-                                }
-                            },
-                            contentPadding = PaddingValues(14.dp),
-                            shape = CircleShape,
-                            colors = ButtonDefaults.buttonColors(AddButtonColor)
+                                .padding(14.dp)
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.Start,
                         ) {
                             Text(
-                                "Add",
-                                fontSize = 16.sp,
+                                "Quick Add",
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = Color.Black
                             )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 10.dp),
+                                horizontalArrangement = Arrangement.SpaceAround
+                            ) {
+                                Button(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            steps.value = "50"
+                                            updateAct(
+                                                viewModel = viewModel,
+                                                curActivity = curActivity,
+                                                addedSteps = steps,
+                                                scaffoldState = scaffoldState
+                                            )
+                                        }
+                                    },
+                                    enabled = true,
+                                    shape = CircleShape,
+                                    contentPadding = PaddingValues(14.dp),
+                                    colors = ButtonDefaults.buttonColors(AddButtonColor)
+                                ) {
+                                    Text(
+                                        "+50",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                                Button(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            steps.value = "100"
+                                            updateAct(
+                                                viewModel = viewModel,
+                                                curActivity = curActivity,
+                                                addedSteps = steps,
+                                                scaffoldState = scaffoldState
+                                            )
+                                        }
+                                    },
+                                    enabled = true,
+                                    shape = CircleShape,
+                                    contentPadding = PaddingValues(14.dp),
+                                    colors = ButtonDefaults.buttonColors(AddButtonColor)
+                                ) {
+                                    Text(
+                                        "+100",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                                Button(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            steps.value ="200"
+                                            updateAct(
+                                                viewModel = viewModel,
+                                                curActivity = curActivity,
+                                                addedSteps = steps,
+                                                scaffoldState = scaffoldState
+                                            )
+                                        }
+                                    },
+                                    enabled = true,
+                                    shape = CircleShape,
+                                    contentPadding = PaddingValues(14.dp),
+                                    colors = ButtonDefaults.buttonColors(AddButtonColor)
+                                ) {
+                                    Text(
+                                        "+200",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                                Button(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            steps.value = "500"
+                                            updateAct(
+                                                viewModel = viewModel,
+                                                curActivity = curActivity,
+                                                addedSteps = steps,
+                                                scaffoldState = scaffoldState
+                                            )
+                                        }
+                                    },
+                                    enabled = true,
+                                    shape = CircleShape,
+                                    contentPadding = PaddingValues(14.dp),
+                                    colors = ButtonDefaults.buttonColors(AddButtonColor)
+                                ) {
+                                    Text(
+                                        "+500",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                            OutlinedTextField(
+                                value = addSteps.value,
+                                onValueChange = { addedSteps -> addSteps.value = addedSteps },
+                                label = { Text(text = "Add Steps") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+
+                                        coroutineScope.launch {
+                                            updateAct(
+                                                viewModel = viewModel,
+                                                curActivity = curActivity,
+                                                addedSteps = addSteps,
+                                                scaffoldState = scaffoldState
+                                            )
+                                        }
+                                    }
+                                ),
+                                singleLine = true,
+                                shape = CircleShape
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        updateAct(
+                                            viewModel = viewModel,
+                                            curActivity = curActivity,
+                                            addedSteps = addSteps,
+                                            scaffoldState = scaffoldState
+                                        )
+                                    }
+                                },
+                                contentPadding = PaddingValues(14.dp),
+                                shape = CircleShape,
+                                colors = ButtonDefaults.buttonColors(AddButtonColor)
+                            ) {
+                                Text(
+                                    "Add",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    onClick = { navController.navigate(route = Screen.EditActivityScreen.passActivity(
-                        date = curActivity.date,
-                        goalName = curActivity.goalName,
-                        goalTarget = curActivity.goalTarget,
-                        steps = curActivity.steps
-                    )) },
-                    shape = CircleShape,
-                    contentPadding = PaddingValues(14.dp),
-                    colors = ButtonDefaults.buttonColors(ButtonColor)
-                ) {
-                    Text(
-                        "Edit Activity",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        onClick = { navController.navigate(route = Screen.EditActivityScreen.passActivity(
+                            date = curActivity.date,
+                            goalName = curActivity.goalName,
+                            goalTarget = curActivity.goalTarget,
+                            steps = curActivity.steps
+                        )) },
+                        shape = CircleShape,
+                        contentPadding = PaddingValues(14.dp),
+                        colors = ButtonDefaults.buttonColors(ButtonColor)
+                    ) {
+                        Text(
+                            "Edit Activity",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
                 }
             }
         }
     }
+
 
 
 }

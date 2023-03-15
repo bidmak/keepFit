@@ -30,60 +30,31 @@ import com.example.keepfit.ui.goal.Goal
 import com.example.keepfit.ui.history.History
 import com.example.keepfit.ui.activity.Activity
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun KeepFitApp(){
-    val navController = rememberNavController()
+    val bottomNavController = rememberNavController()
 
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                items = listOf(
-                    BottomNavItem(
-                        name = Screen.Activity.route,
-                        route = Screen.Activity.route,
-                        icon = Icons.Default.Home
-                    ),
-                    BottomNavItem(
-                        name = Screen.Goal.route,
-                        route = Screen.Goal.route,
-                        icon = Icons.Default.Add
-                    ),
-                    BottomNavItem(
-                        name = Screen.History.route,
-                        route = Screen.History.route,
-                        icon = ImageVector.vectorResource(id = R.drawable.baseline_history_24)
-                    ),
-                ),
-                navController = navController,
-                onItemClick = {
-                    navController.navigate(it.route)
-                }
+    NavHost(navController = bottomNavController, startDestination = Screen.Activity.route){
+        composable(route = Screen.Activity.route){
+            Activity(
+                bottomNavController = bottomNavController
             )
         }
-    ){
-        Navigation(navController = navController)
-    }
-
-}
-
-
-
-@Composable
-fun Navigation(navController: NavHostController){
-    NavHost(navController = navController, startDestination = Screen.Activity.route){
-        composable(route = Screen.Activity.route){
-            Activity()
-        }
         composable(route = Screen.Goal.route){
-            Goal()
+            Goal(
+                bottomNavController = bottomNavController
+            )
         }
         composable(route = Screen.History.route){
-            History()
+            History(
+                bottomNavController = bottomNavController
+            )
         }
 
     }
+
 }
+
 
 
 @Composable
@@ -152,10 +123,27 @@ fun EditTopBar(
 
 @Composable
 fun BottomNavigationBar(
-    items: List<BottomNavItem>,
     navController: NavController,
     onItemClick: (BottomNavItem) -> Unit
 ){
+    val items = listOf(
+        BottomNavItem(
+            name = Screen.Activity.route,
+            route = Screen.Activity.route,
+            icon = Icons.Default.Home
+        ),
+        BottomNavItem(
+            name = Screen.Goal.route,
+            route = Screen.Goal.route,
+            icon = Icons.Default.Add
+        ),
+        BottomNavItem(
+            name = Screen.History.route,
+            route = Screen.History.route,
+            icon = ImageVector.vectorResource(id = R.drawable.baseline_history_24)
+        ),
+    )
+
     val backStackEntry = navController.currentBackStackEntryAsState()
     BottomNavigation(
         modifier = Modifier

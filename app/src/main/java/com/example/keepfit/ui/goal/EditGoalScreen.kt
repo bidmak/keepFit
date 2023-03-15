@@ -1,5 +1,6 @@
 package com.example.keepfit.ui.goal
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,13 +17,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.keepfit.data.entity.GoalData
+import com.example.keepfit.ui.BottomNavigationBar
 import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.theme.ButtonColor
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun EditGoalScreen(
+    bottomNavController: NavController,
     onBackPress: () -> Unit,
     goalName: String = "",
     goalTarget: String = ""
@@ -33,8 +38,18 @@ fun EditGoalScreen(
     val viewModel: GoalViewModel = viewModel()
 
     val coroutineScope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
 
-    Surface {
+    Scaffold(
+        topBar = { EditTopBar(title = "Edit Goal", back = true, onBackPress = onBackPress) },
+        bottomBar = {
+            BottomNavigationBar(
+                onItemClick = { bottomNavController.navigate(it.route) },
+                navController = bottomNavController
+            )
+        },
+        scaffoldState = scaffoldState
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -42,7 +57,6 @@ fun EditGoalScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            EditTopBar(title = "Add Goal", back = true, onBackPress = onBackPress)
             Spacer(modifier = Modifier.height(30.dp))
             OutlinedTextField(
                 value = goalName.value,
@@ -73,15 +87,25 @@ fun EditGoalScreen(
                 onClick = {
 
                     coroutineScope.launch {
-                        val target = goalTarget.value.toInt()
-                        viewModel.updateGoal(
-                            GoalData(
-                                goalName = goalName.value,
-                                goalTarget = target
+                        try {
+                            val target = goalTarget.value.toInt()
+                            viewModel.updateGoal(
+                                GoalData(
+                                    goalName = goalName.value,
+                                    goalTarget = target
+                                )
                             )
-                        )
+                            onBackPress()
+                        } catch (e: Exception){
+                            goalTarget.value = ""
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                message ="Goal target can only be a numeric value",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+
                     }
-                    onBackPress()
+
                 },
                 shape = CircleShape,
                 contentPadding = PaddingValues(18.dp),

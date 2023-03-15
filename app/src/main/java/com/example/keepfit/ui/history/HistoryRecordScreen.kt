@@ -28,6 +28,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.rememberKeepFitAppState
+import com.example.keepfit.ui.BottomNavigationBar
+import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
 import com.example.keepfit.ui.activity.ActivityViewModel
@@ -38,19 +40,24 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HistoryRecordScreen(
-    navController: NavController
+    navController: NavController,
+    bottomNavController: NavController
 ){
     val viewModel: ActivityViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
 
-    Scaffold {
+    Scaffold(
+        topBar = { TopBar(title = "History", menu = true, onClick = {navController.navigate(Screen.HistoryScreen.route)}) },
+        bottomBar = { BottomNavigationBar(
+            onItemClick = { bottomNavController.navigate(it.route) },
+            navController = bottomNavController
+        ) }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(BackgroundColorMain)
         ) {
-            TopBar(title = "History", menu = true, onClick = {navController.navigate(Screen.HistoryScreen.route)})
-
             LazyColumn(
                 contentPadding = PaddingValues(0.dp),
                 verticalArrangement = Arrangement.SpaceEvenly

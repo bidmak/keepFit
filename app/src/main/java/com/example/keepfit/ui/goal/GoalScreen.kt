@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.keepfit.data.entity.GoalData
+import com.example.keepfit.ui.BottomNavigationBar
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
 import com.example.keepfit.ui.activity.activeGoal
@@ -29,13 +30,18 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun GoalScreen(
-    navController: NavController
+    navController: NavController,
+    bottomNavController: NavController
 ){
     val viewModel: GoalViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
 
     Scaffold(
-        modifier = Modifier.padding(bottom = 60.dp),
+        topBar = {TopBar(title = "Goals")},
+        bottomBar = { BottomNavigationBar(
+            onItemClick = { bottomNavController.navigate(it.route) },
+            navController = bottomNavController
+        ) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(route = Screen.AddGoalScreen.route)},
@@ -56,7 +62,6 @@ fun GoalScreen(
                 .fillMaxSize()
                 .background(BackgroundColorMain)
         ) {
-            TopBar(title = "Goals")
 
             val list = viewState.goals
             LazyColumn(
