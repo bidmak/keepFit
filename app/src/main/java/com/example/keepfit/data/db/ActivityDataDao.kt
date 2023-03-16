@@ -22,4 +22,7 @@ interface ActivityDataDao {
 
     @Delete
     suspend fun delete(entity: ActivityData): Int
+
+    @Delete
+    suspend fun deleteAll(entity: List<ActivityData>): Int
 }

@@ -25,6 +25,10 @@ class ActivityViewModel(
         return activityDataRepository.removeActivity(activity)
     }
 
+    suspend fun deleteAllActivity(activities: List<ActivityData>): Int {
+        return activityDataRepository.removeAllActivities(activities)
+    }
+
     suspend fun updateActivity(activity: ActivityData) {
         return activityDataRepository.editCurrentActivity(activity)
     }

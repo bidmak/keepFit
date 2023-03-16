@@ -1,13 +1,9 @@
 package com.example.keepfit.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,16 +11,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.keepfit.*
 import com.example.keepfit.R
 import com.example.keepfit.ui.goal.Goal
 import com.example.keepfit.ui.history.History
@@ -60,7 +55,7 @@ fun KeepFitApp(){
 @Composable
 fun TopBar(
     title: String,
-    menu:Boolean = false,
+    settings:Boolean = false,
     onClick: () -> Unit = {/*TODO if menu is true*/}
 ){
     Box(
@@ -69,16 +64,17 @@ fun TopBar(
             .fillMaxWidth()
     ){
         TopAppBar(
-            title = { Text(text = title)},
+            title = { Text(text = title, fontSize = 20.sp)},
             backgroundColor = Color.White,
             elevation = 5.dp,
             contentColor = Color.Black,
             actions = {
-                if (menu){
+                if (settings){
+                    Text(text = "SETTINGS", fontWeight = FontWeight.Bold)
                     IconButton(onClick = onClick ) {
                         Icon(
                             modifier = Modifier.padding(horizontal = 10.dp),
-                            imageVector = Icons.Default.Menu,
+                            imageVector = Icons.Default.Settings,
                             contentDescription = "menu",
                             tint = Color.Black)
                     }
@@ -101,7 +97,7 @@ fun EditTopBar(
             .fillMaxWidth()
     ){
         TopAppBar(
-            title = { Text(text = title)},
+            title = { Text(text = title, fontSize = 20.sp)},
             backgroundColor = Color.White,
             elevation = 5.dp,
             contentColor = Color.Black,

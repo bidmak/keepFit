@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
@@ -34,6 +32,7 @@ import com.example.keepfit.ui.activity.ActivityViewModel
 import com.example.keepfit.ui.activity.ProgressBar
 import com.example.keepfit.ui.activity.toDayNumber
 import com.example.keepfit.ui.theme.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -45,14 +44,37 @@ fun HistoryRecordScreen(
     val viewModel: ActivityViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
 
+    val coroutineScope = rememberCoroutineScope()
+
     val sortedActivities = viewState.activities.sortedByDescending{ toDayNumber(it.date) }
 
     Scaffold(
-        topBar = { TopBar(title = "Editable History", menu = true, onClick = {navController.navigate(Screen.HistoryScreen.route)}) },
+        topBar = { TopBar(title = "History Recording", settings = true, onClick = {
+
+            navController.navigate(Screen.HistoryScreen.route)
+        }) },
         bottomBar = { BottomNavigationBar(
             onItemClick = { bottomNavController.navigate(it.route) },
             navController = bottomNavController
-        ) }
+        ) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.deleteAllActivity(sortedActivities)
+                    }
+                },
+                contentColor = Color.Black,
+                modifier = Modifier.padding(20.dp),
+                backgroundColor = BackgroundColor
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = DeleteColor
+                )
+            }
+        }
     ) {
         Column(
             modifier = Modifier
@@ -66,7 +88,8 @@ fun HistoryRecordScreen(
                 items(sortedActivities){ activityData ->
                     HisListItems(
                         activity = activityData,
-                        navController = navController
+                        navController = navController,
+                        coroutineScope = coroutineScope
                     )
                 }
             }
@@ -79,9 +102,9 @@ fun HistoryRecordScreen(
 private fun HisListItems(
     activity: ActivityData,
     viewModel: ActivityViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    coroutineScope: CoroutineScope
 ){
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -114,18 +137,18 @@ private fun HisListItems(
                     )
                     Text(
                         text = activity.goalName,
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color.DarkGray
                     )
                     Text(
                         text = "${activity.goalTarget}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color.DarkGray
                     )
                     Text(
-                        text = "${activity.steps} steps",
+                        text = "Steps completed: ${activity.steps} steps",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Gray
@@ -138,7 +161,7 @@ private fun HisListItems(
                     strokeWidth = 5.dp,
                     fontSize = 15.sp,
                     showSteps = false,
-                    color = DeleteColor
+                    color = AddButtonColor
                 )
 
                 IconButton(onClick = {
@@ -167,7 +190,7 @@ private fun HisListItems(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 30.dp),
                         imageVector = Icons.Default.Delete,
                         contentDescription = "delete",
-                        tint = EditColor
+                        tint = DeleteColor
                     )
                 }
             }

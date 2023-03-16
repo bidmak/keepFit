@@ -29,6 +29,11 @@ class ActivityDataRepository (
     suspend fun removeActivity(activity: ActivityData): Int = activityDataDao.delete(activity)
 
     /**
+     *  To delete [ActivityData] from the DataBase
+     */
+    suspend fun removeAllActivities(activities: List<ActivityData>): Int = activityDataDao.deleteAll(activities)
+
+    /**
      *  To update current [ActivityData] in the DataBase
      */
     suspend fun editCurrentActivity(activity: ActivityData) = activityDataDao.update(activity)

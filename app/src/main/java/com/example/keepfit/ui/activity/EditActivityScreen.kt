@@ -85,19 +85,19 @@ fun EditActivityScreen(
                 Text(
                     "Today",
                     modifier = Modifier.padding(horizontal = 5.dp),
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = LightTextColor,
                 )
-                Text("${curActivity.date}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("${curActivity.date}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
 
             Text(
                 "Select a goal",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 14.dp),
-                fontSize = 20.sp,
+                    .padding(start = 24.dp),
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )

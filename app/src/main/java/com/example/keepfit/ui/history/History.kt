@@ -32,7 +32,7 @@ fun History(
 ){
     NavHost(
         navController = appState.navController,
-        startDestination = Screen.HistoryRecordScreen.route
+        startDestination = Screen.HistoryScreen.route
     ){
         composable(route = Screen.HistoryRecordScreen.route){
             HistoryRecordScreen(
