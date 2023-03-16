@@ -27,13 +27,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
-import com.example.keepfit.rememberKeepFitAppState
 import com.example.keepfit.ui.BottomNavigationBar
-import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
 import com.example.keepfit.ui.activity.ActivityViewModel
 import com.example.keepfit.ui.activity.ProgressBar
+import com.example.keepfit.ui.activity.toDayNumber
 import com.example.keepfit.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -46,8 +45,10 @@ fun HistoryRecordScreen(
     val viewModel: ActivityViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
 
+    val sortedActivities = viewState.activities.sortedByDescending{ toDayNumber(it.date) }
+
     Scaffold(
-        topBar = { TopBar(title = "History", menu = true, onClick = {navController.navigate(Screen.HistoryScreen.route)}) },
+        topBar = { TopBar(title = "Editable History", menu = true, onClick = {navController.navigate(Screen.HistoryScreen.route)}) },
         bottomBar = { BottomNavigationBar(
             onItemClick = { bottomNavController.navigate(it.route) },
             navController = bottomNavController
@@ -62,7 +63,7 @@ fun HistoryRecordScreen(
                 contentPadding = PaddingValues(0.dp),
                 verticalArrangement = Arrangement.SpaceEvenly
             ){
-                items(viewState.activities){ activityData ->
+                items(sortedActivities){ activityData ->
                     HisListItems(
                         activity = activityData,
                         navController = navController

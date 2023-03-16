@@ -12,7 +12,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,11 +27,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
 import com.example.keepfit.ui.BottomNavigationBar
-import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.Screen
 import com.example.keepfit.ui.TopBar
 import com.example.keepfit.ui.activity.ActivityViewModel
 import com.example.keepfit.ui.activity.ProgressBar
+import com.example.keepfit.ui.activity.toDayNumber
 import com.example.keepfit.ui.theme.BackgroundColorMain
 import com.example.keepfit.ui.theme.DeleteColor
 import com.example.keepfit.ui.theme.EditColor
@@ -46,6 +45,8 @@ fun HistoryScreen(
 ){
     val viewModel: ActivityViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
+
+    val sortedActivities = viewState.activities.sortedByDescending{ toDayNumber(it.date) }
 
     Scaffold(
         topBar = { TopBar(title = "History", menu = true, onClick = {navController.navigate(Screen.HistoryRecordScreen.route)}) },
@@ -63,10 +64,9 @@ fun HistoryScreen(
                 contentPadding = PaddingValues(0.dp),
                 verticalArrangement = Arrangement.SpaceEvenly
             ){
-                items(viewState.activities){ activityData ->
+                items(sortedActivities){ activityData ->
                     ListItems(
-                        activity = activityData,
-                        navController = navController
+                        activity = activityData
                     )
                 }
             }
@@ -77,8 +77,7 @@ fun HistoryScreen(
 @Composable
 private fun ListItems(
     activity: ActivityData,
-    viewModel: ActivityViewModel = viewModel(),
-    navController: NavController
+    viewModel: ActivityViewModel = viewModel()
 ){
     val coroutineScope = rememberCoroutineScope()
 

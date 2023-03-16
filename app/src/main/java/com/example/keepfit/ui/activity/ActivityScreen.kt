@@ -40,6 +40,10 @@ fun Long.toDayString(): String {
     return SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(Date(this))
 }
 
+fun toDayNumber(date: String): Long {
+    return SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).parse(date)!!.time
+}
+
 suspend fun updateAct(
     viewModel: ActivityViewModel,
     curActivity: ActivityData,

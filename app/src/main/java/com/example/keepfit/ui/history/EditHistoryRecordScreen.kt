@@ -67,7 +67,7 @@ fun EditHistoryRecordScreen(
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
-        topBar = { EditTopBar(title = "Editable History", back = true, onBackPress = onBackPress) },
+        topBar = { EditTopBar(title = "Edit History", back = true, onBackPress = onBackPress) },
         bottomBar = { BottomNavigationBar(
             onItemClick = { bottomNavController.navigate(it.route) },
             navController = bottomNavController
