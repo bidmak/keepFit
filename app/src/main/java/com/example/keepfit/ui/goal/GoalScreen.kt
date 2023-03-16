@@ -36,8 +36,10 @@ fun GoalScreen(
     val viewModel: GoalViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
 
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
-        topBar = {TopBar(title = "Goals")},
+        topBar = {TopBar(title = "Goals", settings = true, onClick = {})},
         bottomBar = { BottomNavigationBar(
             onItemClick = { bottomNavController.navigate(it.route) },
             navController = bottomNavController
@@ -70,10 +72,113 @@ fun GoalScreen(
             ){
                 items(list){ item ->
 
-                    GoalListItems(
-                        goal = item,
-                        navController = navController
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        if(activeGoal == item.goalName ){
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 5.dp, vertical = 2.dp)
+                                    .fillMaxWidth()
+                                    .shadow(elevation = 1.dp, shape = RoundedCornerShape(10.dp))
+                                    .background(AddButtonColor)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ){
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.7f),
+                                        horizontalAlignment = Alignment.Start,
+                                    ) {
+                                        Text(
+                                            text = item.goalName,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                        Text(
+                                            text = "${item.goalTarget} steps",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+                items(list){ item ->
+                    if(activeGoal != item.goalName ){
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 5.dp, vertical = 2.dp)
+                                .fillMaxWidth()
+                                .shadow(elevation = 1.dp, shape = RoundedCornerShape(10.dp))
+                                .background(Color.White)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ){
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.7f),
+                                    horizontalAlignment = Alignment.Start,
+                                ) {
+                                    Text(
+                                        text = item.goalName,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Black
+                                    )
+                                    Text(
+                                        text = "${item.goalTarget} steps",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Gray
+                                    )
+                                }
+                                IconButton(onClick = {
+
+                                    navController.navigate(
+                                        route = Screen.EditGoalScreen.passGoal(
+                                            goalName = item.goalName,
+                                            goalTarget = "${item.goalTarget}"
+                                        )
+                                    )
+
+                                } ) {
+                                    Icon(
+                                        modifier = Modifier.padding(horizontal = 10.dp),
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "edit",
+                                        tint = EditColor)
+                                }
+                                IconButton(onClick = {
+                                    coroutineScope.launch {
+                                        viewModel.deleteGoal(item)
+                                    }
+                                }) {
+                                    Icon(
+                                        modifier = Modifier.padding(horizontal = 10.dp),
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "delete",
+                                        tint = DeleteColor)
+                                }
+                            }
+                        }
+
+                    }
                 }
             }
         }
@@ -87,76 +192,14 @@ private fun GoalListItems(
     viewModel: GoalViewModel = viewModel(),
     navController: NavController
 ){
-    val coroutineScope = rememberCoroutineScope()
+
 
     Column(
         modifier = Modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 5.dp, vertical = 2.dp)
-                .fillMaxWidth()
-                .shadow(elevation = 1.dp, shape = RoundedCornerShape(10.dp))
-                .background(Color.White)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f),
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    Text(
-                        text = goal.goalName,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = "${goal.goalTarget} steps",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray
-                    )
-                }
-                if(activeGoal != goal.goalName){
-                    IconButton(onClick = {
 
-                        navController.navigate(
-                            route = Screen.EditGoalScreen.passGoal(
-                                goalName = goal.goalName,
-                                goalTarget = "${goal.goalTarget}"
-                            )
-                        )
-
-                    } ) {
-                        Icon(
-                            modifier = Modifier.padding(horizontal = 10.dp),
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "edit",
-                            tint = EditColor)
-                    }
-                    IconButton(onClick = {
-                        coroutineScope.launch {
-                            viewModel.deleteGoal(goal)
-                        }
-                    }) {
-                        Icon(
-                            modifier = Modifier.padding(horizontal = 10.dp),
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "delete",
-                            tint = DeleteColor)
-                    }
-                }
-
-            }
-        }
     }
 
 }
