@@ -89,26 +89,34 @@ fun EditGoalScreen(
                     coroutineScope.launch {
                         try {
                             val target = curGoalTarget.value.toInt()
-                            var snack = false
-                            viewState.goals.forEach {
-                                snack = it.goalName == curGoalName.value && curGoalName.value != goalName
-                            }
-                            if (!snack){
-                                viewModel.updateGoal(
-                                    GoalData(
-                                        id = id,
-                                        goalName = curGoalName.value,
-                                        goalTarget = target
+
+                            if (curGoalName.value.isNotEmpty()){
+                                var snack = false
+                                viewState.goals.forEach {
+                                    snack = it.goalName == curGoalName.value && curGoalName.value != goalName
+                                }
+                                if (!snack){
+                                    viewModel.updateGoal(
+                                        GoalData(
+                                            id = id,
+                                            goalName = curGoalName.value,
+                                            goalTarget = target
+                                        )
                                     )
-                                )
-                                onBackPress()
+                                    onBackPress()
+                                } else {
+                                    scaffoldState.snackbarHostState.showSnackbar(
+                                        message ="Goal name already exist",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
+
                             } else {
                                 scaffoldState.snackbarHostState.showSnackbar(
-                                    message ="Goal name already exist",
+                                    message ="Goal name cannot be empty",
                                     duration = SnackbarDuration.Short
                                 )
                             }
-
                         } catch (e: Exception){
                             curGoalTarget.value = ""
                             scaffoldState.snackbarHostState.showSnackbar(
