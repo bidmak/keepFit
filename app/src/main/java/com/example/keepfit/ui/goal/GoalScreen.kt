@@ -19,10 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.keepfit.data.entity.GoalData
-import com.example.keepfit.ui.BottomNavigationBar
-import com.example.keepfit.ui.Screen
-import com.example.keepfit.ui.TopBar
+import com.example.keepfit.Graph
+import com.example.keepfit.PreferenceViewModel
+import com.example.keepfit.data.entity.PreferenceData
+import com.example.keepfit.ui.*
 import com.example.keepfit.ui.activity.activeGoal
 import com.example.keepfit.ui.theme.*
 import kotlinx.coroutines.launch
@@ -36,10 +36,21 @@ fun GoalScreen(
     val viewModel: GoalViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
 
+    val preferenceViewModel: PreferenceViewModel = viewModel()
+    val preferenceViewState by preferenceViewModel.state.collectAsState()
+
+    val goalPreference = preferenceViewState.preferences.firstOrNull{preference -> preference.id == 1
+    } ?: PreferenceData(preference = false)
+
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = {TopBar(title = "Goals", settings = true, onClick = {})},
+        topBar = {TopBar(
+            title = "Goals", settings = true,
+            show = goalPreference.preference,
+            editGoal = true,
+            showId = goalPreference.id
+            )},
         bottomBar = { BottomNavigationBar(
             onItemClick = { bottomNavController.navigate(it.route) },
             navController = bottomNavController
@@ -59,11 +70,13 @@ fun GoalScreen(
             }
         }
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundColorMain)
+                .background(Color.White)
         ) {
+
 
             val list = viewState.goals
             LazyColumn(
@@ -83,7 +96,7 @@ fun GoalScreen(
                                     .padding(horizontal = 5.dp, vertical = 2.dp)
                                     .fillMaxWidth()
                                     .shadow(elevation = 1.dp, shape = RoundedCornerShape(10.dp))
-                                    .background(AddButtonColor)
+                                    .background(Color(0xFFB8A8D6))
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -122,13 +135,14 @@ fun GoalScreen(
                                 .padding(horizontal = 5.dp, vertical = 2.dp)
                                 .fillMaxWidth()
                                 .shadow(elevation = 1.dp, shape = RoundedCornerShape(10.dp))
-                                .background(Color.White)
+                                .background(BackgroundColorMain)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ){
                                 Column(
                                     modifier = Modifier
@@ -139,42 +153,45 @@ fun GoalScreen(
                                         text = item.goalName,
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.Black
+                                        color = Color.DarkGray
                                     )
                                     Text(
                                         text = "${item.goalTarget} steps",
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.Gray
+                                        color = Color.DarkGray
                                     )
                                 }
-                                IconButton(onClick = {
+                                if (goalPreference.preference){
+                                    IconButton(onClick = {
 
-                                    navController.navigate(
-                                        route = Screen.EditGoalScreen.passGoal(
-                                            goalName = item.goalName,
-                                            goalTarget = "${item.goalTarget}"
+                                        navController.navigate(
+                                            route = Screen.EditGoalScreen.passGoal(
+                                                goalName = item.goalName,
+                                                goalTarget = "${item.goalTarget}"
+                                            )
                                         )
-                                    )
 
-                                } ) {
-                                    Icon(
-                                        modifier = Modifier.padding(horizontal = 10.dp),
-                                        imageVector = Icons.Default.Edit,
-                                        contentDescription = "edit",
-                                        tint = EditColor)
-                                }
-                                IconButton(onClick = {
-                                    coroutineScope.launch {
-                                        viewModel.deleteGoal(item)
+                                    } ) {
+                                        Icon(
+                                            modifier = Modifier.padding(horizontal = 10.dp),
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "edit",
+                                            tint = EditColor)
                                     }
-                                }) {
-                                    Icon(
-                                        modifier = Modifier.padding(horizontal = 10.dp),
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "delete",
-                                        tint = DeleteColor)
+                                    IconButton(onClick = {
+                                        coroutineScope.launch {
+                                            viewModel.deleteGoal(item)
+                                        }
+                                    }) {
+                                        Icon(
+                                            modifier = Modifier.padding(horizontal = 10.dp),
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "delete",
+                                            tint = DeleteColor)
+                                    }
                                 }
+
                             }
                         }
 
@@ -185,22 +202,4 @@ fun GoalScreen(
     }
 }
 
-
-@Composable
-private fun GoalListItems(
-    goal: GoalData,
-    viewModel: GoalViewModel = viewModel(),
-    navController: NavController
-){
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly
-    ) {
-
-    }
-
-}
 

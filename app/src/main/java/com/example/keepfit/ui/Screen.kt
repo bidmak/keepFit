@@ -47,7 +47,6 @@ sealed class Screen(val route: String){
     }
 
     object HistoryScreen: Screen(route = "historyScreen")
-    object HistoryRecordScreen: Screen(route = "historyRecordScreen")
     object EditHistoryRecordScreen: Screen(route = "editHistoryRecordScreen" +
             "?date={$ACTIVITY_DATE}" +
             "&goalName={$ACTIVITY_NAME}" +

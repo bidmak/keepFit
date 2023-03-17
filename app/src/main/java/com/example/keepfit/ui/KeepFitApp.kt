@@ -1,29 +1,41 @@
 package com.example.keepfit.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.keepfit.PreferenceViewModel
 import com.example.keepfit.R
+import com.example.keepfit.data.entity.PreferenceData
 import com.example.keepfit.ui.goal.Goal
 import com.example.keepfit.ui.history.History
 import com.example.keepfit.ui.activity.Activity
+import com.example.keepfit.ui.theme.ButtonColor
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 @Composable
 fun KeepFitApp(){
@@ -56,8 +68,13 @@ fun KeepFitApp(){
 fun TopBar(
     title: String,
     settings:Boolean = false,
-    onClick: () -> Unit = {/*TODO if menu is true*/}
+    editHistory: Boolean = false,
+    editGoal: Boolean = false,
+    show: Boolean = false,
+    showId: Int = 0
 ){
+    var expanded by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .height(60.dp)
@@ -71,13 +88,55 @@ fun TopBar(
             actions = {
                 if (settings){
                     Text(text = "SETTINGS", fontWeight = FontWeight.Bold)
-                    IconButton(onClick = onClick ) {
+                    IconButton(onClick = {expanded = true} ) {
                         Icon(
                             modifier = Modifier.padding(horizontal = 10.dp),
                             imageVector = Icons.Default.Settings,
                             contentDescription = "menu",
                             tint = Color.Black)
                     }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        if (editGoal){
+                            DropdownMenuItem(
+                                onClick = {  }
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = CenterVertically
+                                ){
+                                    Text(
+                                        text = "Edit Goals",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp
+                                    )
+                                    ToggleButton (show, showId)
+                                }
+
+                            }
+                        }
+                        if (editHistory){
+                            DropdownMenuItem(
+                                onClick = {  }
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = CenterVertically
+                                ){
+                                    Text(
+                                        text ="Edit History",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp)
+                                    ToggleButton (show, showId)
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         )
@@ -175,3 +234,94 @@ fun BottomNavigationBar(
         }
     }
 }
+
+
+@Composable
+fun ToggleButton (
+    show: Boolean,
+    showId: Int
+){
+
+    val preferenceViewModel: PreferenceViewModel = viewModel()
+    var isToggled by remember { mutableStateOf(show) }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    Box(
+        contentAlignment = Center,
+        modifier = Modifier.padding(start = 14.dp)
+    ){
+        Card(
+            shape = RoundedCornerShape(39.dp),
+            elevation = 0.dp
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        if (isToggled) ButtonColor else Color.Gray
+                    )
+                    .clickable(
+                        onClick = {
+                            isToggled = !isToggled
+                            coroutineScope.launch {
+                                preferenceViewModel.savePreference(
+                                    PreferenceData(
+                                        id = showId,
+                                        preference = isToggled
+                                    )
+                                )
+                            }
+                        }
+                    ),
+                contentAlignment = Center
+            ) {
+                if (isToggled){
+                    Row(
+                        modifier = Modifier.padding(4.dp)
+                    ){
+                        Text(
+                            text = "On",
+                            style = TextStyle(
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .align(CenterVertically)
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Circle,
+                            contentDescription = "On",
+                            tint = Color.White,
+                            modifier = Modifier.padding(start = 10.dp)
+                        )
+                    }
+                } else{
+                    Row(
+                        modifier = Modifier.padding(4.dp)
+                    ){
+                        Icon(
+                            imageVector = Icons.Default.Circle,
+                            contentDescription = "Off",
+                            tint = Color.White,
+                        )
+                        Text(
+                            text = "Off",
+                            style = TextStyle(
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(start = 10.dp, end = 10.dp)
+                                .align(CenterVertically)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+}
+
