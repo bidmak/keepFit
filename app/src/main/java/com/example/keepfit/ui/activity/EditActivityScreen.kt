@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.keepfit.data.entity.ActivityData
-import com.example.keepfit.data.entity.GoalData
 import com.example.keepfit.ui.BottomNavigationBar
 import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.goal.GoalViewModel
@@ -51,7 +50,7 @@ fun EditActivityScreen(
     val goalViewModel: GoalViewModel = viewModel()
     val goalViewState by goalViewModel.state.collectAsState()
 
-    var selectedGoalName = rememberSaveable { mutableStateOf(curActivity.goalName)}
+    val selectedGoalName = rememberSaveable { mutableStateOf(curActivity.goalName)}
     val selectedGoalTarget = rememberSaveable { mutableStateOf(curActivity.goalTarget)}
 
     var expanded by remember { mutableStateOf(false) }
@@ -89,7 +88,7 @@ fun EditActivityScreen(
                     fontWeight = FontWeight.Bold,
                     color = LightTextColor,
                 )
-                Text("${curActivity.date}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(curActivity.date, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
 
             Text(

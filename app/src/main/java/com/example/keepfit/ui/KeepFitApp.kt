@@ -34,7 +34,6 @@ import com.example.keepfit.ui.goal.Goal
 import com.example.keepfit.ui.history.History
 import com.example.keepfit.ui.activity.Activity
 import com.example.keepfit.ui.theme.ButtonColor
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @Composable

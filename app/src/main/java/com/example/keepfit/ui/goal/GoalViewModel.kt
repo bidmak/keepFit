@@ -26,16 +26,6 @@ class GoalViewModel(
         return  goalDataRepository.updateGoalData(goal)
     }
 
-
-    suspend fun editGoal(goal: GoalData) {
-        return  goalDataRepository.editCurrentGoal(goal)
-    }
-
-    suspend fun getGoal(goalName: String): GoalData? {
-        return  goalDataRepository.getGoalByName(goalName)
-    }
-
-
     suspend fun deleteGoal(goal: GoalData): Int {
         return  goalDataRepository.removeGoal(goal)
     }

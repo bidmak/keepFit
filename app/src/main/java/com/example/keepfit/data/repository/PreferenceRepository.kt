@@ -12,7 +12,5 @@ class PreferenceRepository(
         return preferenceDataDao.getPreference()
     }
 
-    suspend fun updatePreference(preference: PreferenceData) = preferenceDataDao.update(preference)
-
     suspend fun savePreference(preference: PreferenceData) = preferenceDataDao.insert(preference)
 }

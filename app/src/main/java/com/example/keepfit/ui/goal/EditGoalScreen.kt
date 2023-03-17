@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,13 +27,15 @@ import kotlinx.coroutines.launch
 fun EditGoalScreen(
     bottomNavController: NavController,
     onBackPress: () -> Unit,
-    goalName: String = "",
-    goalTarget: String = ""
+    id: Int,
+    goalName: String,
+    goalTarget: String
 ){
-    val goalName = rememberSaveable { mutableStateOf(goalName) }
-    val goalTarget = rememberSaveable { mutableStateOf(goalTarget) }
+    val curGoalName = rememberSaveable { mutableStateOf(goalName) }
+    val curGoalTarget = rememberSaveable { mutableStateOf(goalTarget) }
 
     val viewModel: GoalViewModel = viewModel()
+    val viewState by viewModel.state.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
@@ -59,8 +59,8 @@ fun EditGoalScreen(
         ) {
             Spacer(modifier = Modifier.height(30.dp))
             OutlinedTextField(
-                value = goalName.value,
-                onValueChange = {goal-> goalName.value = goal},
+                value = curGoalName.value,
+                onValueChange = {goal-> curGoalName.value = goal},
                 label = { Text(text = "Add Goal Name") },
                 modifier = Modifier.fillMaxWidth(0.9f),
                 keyboardOptions = KeyboardOptions(
@@ -71,8 +71,8 @@ fun EditGoalScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
-                value = goalTarget.value,
-                onValueChange = {target-> goalTarget.value = target},
+                value = curGoalTarget.value,
+                onValueChange = {target-> curGoalTarget.value = target},
                 label = { Text(text = "Add Goal Target") },
                 modifier = Modifier.fillMaxWidth(0.9f),
                 keyboardOptions = KeyboardOptions(
@@ -88,16 +88,29 @@ fun EditGoalScreen(
 
                     coroutineScope.launch {
                         try {
-                            val target = goalTarget.value.toInt()
-                            viewModel.updateGoal(
-                                GoalData(
-                                    goalName = goalName.value,
-                                    goalTarget = target
+                            val target = curGoalTarget.value.toInt()
+                            var snack = false
+                            viewState.goals.forEach {
+                                snack = it.goalName == curGoalName.value && curGoalName.value != goalName
+                            }
+                            if (!snack){
+                                viewModel.updateGoal(
+                                    GoalData(
+                                        id = id,
+                                        goalName = curGoalName.value,
+                                        goalTarget = target
+                                    )
                                 )
-                            )
-                            onBackPress()
+                                onBackPress()
+                            } else {
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    message ="Goal name already exist",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+
                         } catch (e: Exception){
-                            goalTarget.value = ""
+                            curGoalTarget.value = ""
                             scaffoldState.snackbarHostState.showSnackbar(
                                 message ="Goal target can only be a numeric value",
                                 duration = SnackbarDuration.Short

@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.keepfit.KeepFitAppState
 import com.example.keepfit.rememberKeepFitAppState
+import com.example.keepfit.ui.GOAL_ID
 import com.example.keepfit.ui.GOAL_NAME
 import com.example.keepfit.ui.GOAL_TARGET
 import com.example.keepfit.ui.Screen
@@ -35,24 +36,30 @@ fun Goal(
         composable(
             route = Screen.EditGoalScreen.route,
             arguments = listOf(
+                navArgument(GOAL_ID){
+                    type = NavType.IntType
+                    defaultValue = 0
+                },
                 navArgument(GOAL_NAME){
                     type = NavType.StringType
-                    nullable = true
+                    defaultValue = ""
                 },
                 navArgument(GOAL_TARGET){
                     type = NavType.StringType
-                    nullable = true
+                    defaultValue = ""
                 }
             )
         ){
-            val goalName = it.arguments?.getString(GOAL_NAME) ?: ""
-            val goalTarget = it.arguments?.getString(GOAL_TARGET) ?: ""
+            val id = it.arguments?.getInt(GOAL_ID)
+            val goalName = it.arguments?.getString(GOAL_NAME)
+            val goalTarget = it.arguments?.getString(GOAL_TARGET)
 
             EditGoalScreen(
                 bottomNavController = bottomNavController,
                 onBackPress = appState::navigationBack,
-                goalName = goalName,
-                goalTarget = goalTarget
+                id = id!!,
+                goalName = goalName!!,
+                goalTarget = goalTarget!!
             )
         }
     }

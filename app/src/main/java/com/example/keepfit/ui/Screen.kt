@@ -1,5 +1,6 @@
 package com.example.keepfit.ui
 
+const val GOAL_ID = "id"
 const val GOAL_NAME = "goalName"
 const val GOAL_TARGET = "goalTarget"
 
@@ -37,12 +38,13 @@ sealed class Screen(val route: String){
 
     object GoalScreen: Screen(route = "goalScreen")
     object AddGoalScreen: Screen(route = "addGoalScreen")
-    object EditGoalScreen: Screen(route = "editGoalScreen?goalName={$GOAL_NAME}&goalTarget={$GOAL_TARGET}"){
+    object EditGoalScreen: Screen(route = "editGoalScreen?id={$GOAL_ID}&goalName={$GOAL_NAME}&goalTarget={$GOAL_TARGET}"){
         fun passGoal(
-            goalName: String = "Goal Name",
-            goalTarget: String = "0"
+            id: Int,
+            goalName: String,
+            goalTarget: String
         ): String {
-            return "editGoalScreen?goalName=$goalName&goalTarget=$goalTarget"
+            return "editGoalScreen?id=$id&goalName=$goalName&goalTarget=$goalTarget"
         }
     }
 

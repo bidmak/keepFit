@@ -17,9 +17,6 @@ interface ActivityDataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: ActivityData): Long
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(entity: ActivityData)
-
     @Delete
     suspend fun delete(entity: ActivityData): Int
 

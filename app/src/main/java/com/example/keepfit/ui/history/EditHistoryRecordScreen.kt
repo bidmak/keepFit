@@ -26,7 +26,6 @@ import com.example.keepfit.ui.EditTopBar
 import com.example.keepfit.ui.activity.ActivityViewModel
 import com.example.keepfit.ui.goal.GoalViewModel
 import com.example.keepfit.ui.theme.ButtonColor
-import com.example.keepfit.ui.theme.LightTextColor
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -85,7 +84,7 @@ fun EditHistoryRecordScreen(
                 horizontalArrangement = Arrangement.Center
 
             ) {
-                Text("${curHistory.date}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(curHistory.date, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -152,13 +151,13 @@ fun EditHistoryRecordScreen(
                     onClick = {
                         coroutineScope.launch {
                             try{
-                                val steps = selectedSteps.value.toInt()
+                                val curSteps = selectedSteps.value.toInt()
                                 activityViewModel.saveActivity(
                                     ActivityData(
                                         date = curHistory.date,
                                         goalName = selectedGoalName.value,
                                         goalTarget = selectedGoalTarget.value,
-                                        steps = steps
+                                        steps = curSteps
                                     )
                                 )
                                 onBackPress()

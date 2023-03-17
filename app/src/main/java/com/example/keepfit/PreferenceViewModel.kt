@@ -20,11 +20,6 @@ class PreferenceViewModel(
         return preferenceRepository.savePreference(preference)
     }
 
-
-    suspend fun updatePreference(preference: PreferenceData) {
-        return preferenceRepository.updatePreference(preference)
-    }
-
     init {
         viewModelScope.launch {
             preferenceRepository.preferences().collect{preferences ->

@@ -30,10 +30,11 @@ fun AddGoalScreen(
     goalName: String = "",
     goalTarget: String = ""
 ){
-    val goalName = rememberSaveable { mutableStateOf(goalName) }
-    val goalTarget = rememberSaveable { mutableStateOf(goalTarget)}
+    val curGoalName = rememberSaveable { mutableStateOf(goalName) }
+    val curGoalTarget = rememberSaveable { mutableStateOf(goalTarget)}
 
     val viewModel: GoalViewModel = viewModel()
+    val viewState by viewModel.state.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
@@ -57,8 +58,8 @@ fun AddGoalScreen(
         ) {
             Spacer(modifier = Modifier.height(30.dp))
             OutlinedTextField(
-                value = goalName.value,
-                onValueChange = {goal-> goalName.value = goal},
+                value = curGoalName.value,
+                onValueChange = {goal-> curGoalName.value = goal},
                 label = {Text(text = "Add Goal Name")},
                 modifier = Modifier.fillMaxWidth(0.9f),
                 keyboardOptions = KeyboardOptions(
@@ -69,8 +70,8 @@ fun AddGoalScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
-                value = goalTarget.value,
-                onValueChange = {target-> goalTarget.value = target},
+                value = curGoalTarget.value,
+                onValueChange = {target-> curGoalTarget.value = target},
                 label = { Text(text = "Add Goal Target")},
                 modifier = Modifier.fillMaxWidth(0.9f),
                 keyboardOptions = KeyboardOptions(
@@ -86,16 +87,27 @@ fun AddGoalScreen(
 
                         coroutineScope.launch {
                             try {
-                                val target = goalTarget.value.toInt()
-                                viewModel.addGoal(
-                                    GoalData(
-                                        goalName = goalName.value,
-                                        goalTarget = target
+                                val target = curGoalTarget.value.toInt()
+                                var snack = false
+                                viewState.goals.forEach {
+                                    snack = it.goalName == curGoalName.value
+                                }
+                                if (!snack){
+                                    viewModel.addGoal(
+                                        GoalData(
+                                            goalName = curGoalName.value,
+                                            goalTarget = target
+                                        )
                                     )
-                                )
-                                onBackPress()
+                                    onBackPress()
+                                } else{
+                                    scaffoldState.snackbarHostState.showSnackbar(
+                                        message ="Goal name already exist",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
                             } catch (e: Exception){
-                                goalTarget.value = ""
+                                curGoalTarget.value = ""
                                 scaffoldState.snackbarHostState.showSnackbar(
                                     message ="Goal target can only be a numeric value",
                                     duration = SnackbarDuration.Short

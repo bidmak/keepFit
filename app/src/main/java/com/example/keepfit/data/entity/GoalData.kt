@@ -8,10 +8,11 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "goals",
     indices = [
-        Index("goalName", unique = true)
+        Index("id", unique = true)
     ]
 )
 data class GoalData(
-    @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "goalName") val goalName: String,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Int = 0,
+    @ColumnInfo(name = "goalName") val goalName: String,
     @ColumnInfo(name = "goalTarget") val goalTarget: Int
 )

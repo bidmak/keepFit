@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.keepfit.Graph
 import com.example.keepfit.PreferenceViewModel
 import com.example.keepfit.data.entity.PreferenceData
 import com.example.keepfit.ui.*
@@ -167,6 +166,7 @@ fun GoalScreen(
 
                                         navController.navigate(
                                             route = Screen.EditGoalScreen.passGoal(
+                                                id = item.id,
                                                 goalName = item.goalName,
                                                 goalTarget = "${item.goalTarget}"
                                             )

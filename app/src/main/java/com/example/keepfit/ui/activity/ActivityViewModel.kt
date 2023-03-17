@@ -29,10 +29,6 @@ class ActivityViewModel(
         return activityDataRepository.removeAllActivities(activities)
     }
 
-    suspend fun updateActivity(activity: ActivityData) {
-        return activityDataRepository.editCurrentActivity(activity)
-    }
-
 
     init {
         viewModelScope.launch {

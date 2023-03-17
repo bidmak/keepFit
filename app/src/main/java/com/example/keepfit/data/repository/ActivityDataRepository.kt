@@ -33,15 +33,5 @@ class ActivityDataRepository (
      */
     suspend fun removeAllActivities(activities: List<ActivityData>): Int = activityDataDao.deleteAll(activities)
 
-    /**
-     *  To update current [ActivityData] in the DataBase
-     */
-    suspend fun editCurrentActivity(activity: ActivityData) = activityDataDao.update(activity)
-
-    /**
-     *  To get [ActivityData] by date from the DataBase
-     */
-/// fun getActivityDataByDate(date: String): ActivityData? = activityDataDao.getActivityDataByDate(date)
-
 
 }

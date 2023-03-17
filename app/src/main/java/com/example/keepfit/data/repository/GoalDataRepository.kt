@@ -27,15 +27,6 @@ class GoalDataRepository(
      */
     suspend fun removeGoal(goal: GoalData) = goalDataDao.delete(goal)
 
-    /**
-     *  To edit current [GoalData] in the DataBase
-     */
-    suspend fun editCurrentGoal(goal: GoalData) = goalDataDao.update(goal)
-
-    /**
-     *  To get goal by goal name from [GoalData] DataBase
-     */
-    suspend fun getGoalByName(goalName: String) = goalDataDao.getGoalDataByName(goalName)
 
     /**
      *  To update [GoalData] in the DataBase
